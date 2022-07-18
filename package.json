@@ -1,0 +1,24 @@
+{
+  "name": "nodejs-complete-guide",
+  "version": "1.0.0",
+  "description": "Complete NodeJS Guide",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start-server": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/huongbls/NodeJS_NJS101x_01-A.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/huongbls/NodeJS_NJS101x_01-A/issues"
+  },
+  "homepage": "https://github.com/huongbls/NodeJS_NJS101x_01-A#readme",
+  "dependencies": {
+    "nodemon": "^1.18.3"
+  }
+}
