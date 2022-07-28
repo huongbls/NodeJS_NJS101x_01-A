@@ -2,11 +2,10 @@ const path = require("path");
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 
 const errorController = require("./controllers/error");
 const User = require("./models/user");
-
-const mongoConnect = require("./util/database").mongoConnect;
 
 const app = express();
 
@@ -34,6 +33,14 @@ app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 
 app.use(errorController.get404);
-mongoConnect(() => {
-  app.listen(3000);
-});
+
+mongoose
+  .connect(
+    "mongodb+srv://test:Nj28g2UmFeAYdDAe@funixnjs101xcluster.hlmi1es.mongodb.net/?retryWrites=true&w=majority"
+  )
+  .then((result) => {
+    app.listen(3000); //lang nghe cac request den
+  })
+  .catch((err) => {
+    console.log(err); // ghi lai bat ky loi tiem an nao co the gap khi ket noi
+  });
