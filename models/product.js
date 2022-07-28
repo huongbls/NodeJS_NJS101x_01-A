@@ -1,3 +1,16 @@
+const mongoose = require("mongoose");
+
+const Schema = mongoose.Schema;
+
+const productSchema = new Schema({
+  title: { type: String, required: true },
+  price: { type: Number, required: true },
+  description: { type: String, required: true },
+  imageUrl: { type: String, required: true },
+  // _id không được thêm ở đây, vì nó được tự động thêm dưới dạng Object id.
+  // chúng ta sẽ thêm userId vào sau
+});
+
 // const mongodb = require("mongodb");
 
 // const getDb = require("../util/database").getDb;
