@@ -9,6 +9,11 @@ const productSchema = new Schema({
   imageUrl: { type: String, required: true },
   // _id không được thêm ở đây, vì nó được tự động thêm dưới dạng Object id.
   // chúng ta sẽ thêm userId vào sau
+  userId: {
+    type: Schema.Types.ObjectId, // tham chiếu đến user
+    ref: "User", // tham chiếu đến model User
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("Product", productSchema);

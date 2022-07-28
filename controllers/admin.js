@@ -18,6 +18,7 @@ exports.postAddProduct = (req, res, next) => {
     price: price,
     description: description,
     imageUrl: imageUrl,
+    userId: req.user, //lấy thông tin user đã được lưu trong request, mongoose sẽ chọn id từ đối tượng user
     // phần bên trái tham chiếu đến các khóa trong schema
   });
   product
