@@ -1,5 +1,7 @@
 const Product = require("../models/product");
 
+const Order = require("../models/order");
+
 exports.getProducts = (req, res, next) => {
   Product.find() // find() trong mongoose cho chúng ta một mảng
     .then((products) => {
@@ -83,9 +85,23 @@ exports.postCartDeleteProduct = (req, res, next) => {
 };
 
 exports.postOrder = (req, res, next) => {
-  let fetchedCart;
   req.user
-    .addOrder()
+    .populate(["cart.items.productId"]) // yêu cầu mongoose tìm nạp dữ liệu theo đường dẫn
+    // .execPopulate() //kết nối execPopulate() thì mới có cấu trúc Promise
+    .then((user) => {
+      const products = user.cart.items.map((i) => {
+        return { quantity: i.quantity, product: i.productId };
+      }); // ánh xạ item để lưu các item đã thay đổi trong mảng products
+      const order = new Order({
+        // tạo một đối tượng order mới
+        user: {
+          name: req.user.name, //req.user là một đối tượng user đầy đủ được tìm nạp từ database
+          userId: req.user, // để mongoose sẽ chọn id từ đối tượng req.user
+        },
+        products: products,
+      });
+      return order.save();
+    })
     .then((result) => res.redirect("/orders"))
     .catch((err) => console.log(err));
 };

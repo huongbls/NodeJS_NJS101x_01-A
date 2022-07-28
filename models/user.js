@@ -49,13 +49,6 @@ userSchema.methods.removeFromCart = function (productId) {
   });
   this.cart.items = updatedCartItems;
   return this.save();
-  //     const db = getDb();
-  //     return db
-  //       .collection("users")
-  //       .updateOne(
-  //         { _id: new ObjectId(this._id) },
-  //         { $set: { cart: { items: updatedCartItems } } }
-  //       );
 };
 
 module.exports = mongoose.model("User", userSchema);
