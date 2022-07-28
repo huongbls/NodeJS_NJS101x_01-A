@@ -13,18 +13,17 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  const product = new Product(
-    title,
-    price,
-    description,
-    imageUrl,
-    null,
-    req.user._id
-  );
+  const product = new Product({
+    title: title,
+    price: price,
+    description: description,
+    imageUrl: imageUrl,
+    // phần bên trái tham chiếu đến các khóa trong schema
+  });
   product
-    .save()
+    .save() // phương thức save đến từ mongoose, chúng ta không xác định chúng
     .then((result) => {
-      // console.log(result);
+      // chúng ta không có promise nào ở đây, mongoose vẫn cung cấp phương thức, then, catch
       console.log("Create Product");
       res.redirect("/admin/products");
     })

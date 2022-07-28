@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const Schema = mongoose.Schema;
+const Schema = mongoose.Schema; //schema: lược đồ
 
 const productSchema = new Schema({
   title: { type: String, required: true },
@@ -10,6 +10,12 @@ const productSchema = new Schema({
   // _id không được thêm ở đây, vì nó được tự động thêm dưới dạng Object id.
   // chúng ta sẽ thêm userId vào sau
 });
+
+module.exports = mongoose.model("Product", productSchema);
+// model đóng vai trò quan trọng trong việc kết nối một schema,
+// một bản thiết kế với tên. Vì vậy bạn đặt tên cho model đó và tên đó
+// ở đây sẽ là Product
+// Đối số thứ hai là schema
 
 // const mongodb = require("mongodb");
 
