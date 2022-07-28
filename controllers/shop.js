@@ -43,10 +43,11 @@ exports.getIndex = (req, res, next) => {
 };
 
 exports.getCart = (req, res, next) => {
-  console.log(req.user.cart);
   req.user
-    .getCart()
-    .then((products) => {
+    .populate(["cart.items.productId"]) // yêu cầu mongoose tìm nạp dữ liệu theo đường dẫn
+    // .execPopulate() //kết nối execPopulate() thì mới có cấu trúc Promise
+    .then((user) => {
+      const products = user.cart.items;
       res.render("shop/cart", {
         path: "/cart",
         pageTitle: "Your Cart",
