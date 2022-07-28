@@ -79,7 +79,10 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find()
+    // .select("title price -_id") // selecct cho phép bạn yêu cầu mongoose hiển thị dữ liệu nào
+    // .populate("userId", "name") // populate cho phép bạn yêu cầu mongoose điền một trường nhất định với tất cả chi tiết thông tin chứ không chỉ id
     .then((products) => {
+      console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",
