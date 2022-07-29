@@ -89,8 +89,9 @@ exports.postOrder = (req, res, next) => {
     .populate(["cart.items.productId"]) // yêu cầu mongoose tìm nạp dữ liệu theo đường dẫn
     // .execPopulate() //kết nối execPopulate() thì mới có cấu trúc Promise
     .then((user) => {
+      console.log(user.cart.items);
       const products = user.cart.items.map((i) => {
-        return { quantity: i.quantity, product: i.productId };
+        return { quantity: i.quantity, product: { ...i.productId._doc } }; //bọc trong dấu ngoặc để tạo đổi tượng, với _doc chúng ta có quyền chỉ truy cập
       }); // ánh xạ item để lưu các item đã thay đổi trong mảng products
       const order = new Order({
         // tạo một đối tượng order mới
