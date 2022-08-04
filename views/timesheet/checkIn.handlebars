@@ -3,7 +3,13 @@
   <form action="/timesheet" method="post">
     <div class="form-group">
       <label for="fullname">Họ và tên</label>
-      <input type="text" class="form-control" name="fullname" />
+      <input
+        type="text"
+        class="form-control"
+        name="fullname"
+        value="{{check-ins.employeeId}}"
+        disabled
+      />
     </div>
     <div class="form-group">
       <label for="workingPlace">Nơi làm việc</label>

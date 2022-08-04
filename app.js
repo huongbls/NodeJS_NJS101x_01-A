@@ -32,6 +32,18 @@ app.use(express.json());
 // Ket noi co so du lieu
 connectDB();
 
+app.use((req, res, next) => {
+  Employee.findById("62e952a9ac7871d6e8098550").then((employee) => {
+    if (employee) {
+      req.employee = employee;
+      console.log("Found: ", employee);
+    } else {
+      console.log("Not found!");
+    }
+    next();
+  });
+});
+
 // Mot so routes co ban, co the dua vao file rieng trong thu muc routes
 app.get("/", (req, res) => res.render("index"));
 app.get("/about", (req, res) => res.render("about"));
