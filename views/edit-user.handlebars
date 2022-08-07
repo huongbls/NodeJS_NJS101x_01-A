@@ -1,0 +1,22 @@
+<div class="wrapper">
+  <div class="user-info">
+    <h5>Họ và tên: {{user.name}}</h5>
+    <p>Ngày sinh: {{tolocaledatestring user.dob}}</p>
+    <p>Lương cơ bản: {{user.salaryScale}} VND</p>
+    <p>Ngày bắt đầu làm việc: {{tolocaledatestring user.startDate}}</p>
+    <p>Phòng: {{user.department}}</p>
+    <p>Ngày nghỉ phép còn lại: {{user.annualLeave}}</p>
+  </div>
+  <div class="user-image">
+    <p>Thay đổi ảnh đại diện: </p>
+    <div class="preview-avatar">
+      <img class="preview" src="{{user.image}}" alt="{{user.name}}" />
+    </div>
+    <form action="/edit-user" method="Post">
+      <input type="text" name="image" id="image" />
+      <input type="hidden" name="id" value="{{user._id}}" />
+      <button type="submit">Save</button>
+    </form>
+  </div>
+</div>
+{{!-- <script src="{{user.image}}"></script> --}}
