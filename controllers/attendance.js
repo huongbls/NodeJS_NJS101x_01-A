@@ -12,7 +12,8 @@ exports.getAttendace = (req, res, next) => {
 
 // Get Attendance Details Page
 exports.getAttendaceDetails = (req, res, next) => {
-  req.user.getAttendanceDetails().then((attendance) => {
+  const user = new User(req.user);
+  user.getAttendanceDetails().then((attendance) => {
     res.render("attendance-details", {
       css: "attendance",
       pageTitle: "Chi tiết công việc",
@@ -26,8 +27,9 @@ exports.getAttendaceDetails = (req, res, next) => {
 exports.postAttendance = (req, res, next) => {
   const type = req.query.type;
   const workplace = req.body.workplace;
+  const user = new User(req.user);
   // Change working status user
-  req.user
+  user
     .getStatus(type, workplace)
     .then((status) => {
       if (type === "start") {

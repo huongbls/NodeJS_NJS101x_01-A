@@ -26,6 +26,12 @@ app.engine(
       tolocaledatestring: function (number) {
         return number.toLocaleDateString();
       },
+      getHours: function (number) {
+        return number.getHours();
+      },
+      getMinutes: function (number) {
+        return number.getMinutes();
+      },
     },
   })
 );

@@ -13,7 +13,8 @@ router.get("/edit-user/:userId", userController.getEditUser);
 router.post("/edit-user", userController.postEditUser);
 
 // Statistic Page
-router.get("/statistic", userController.getStatistic);
+// router.get("/statistic", userController.getStatistic);
+router.get("/statistic", userController.getWorkingStatistic);
 router.get("/statistic-search", userController.getStatisticSearch);
 // router.post('/statistic', userController.postStatisticSalary);
 

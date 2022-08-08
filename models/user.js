@@ -17,85 +17,44 @@ const userSchema = new Schema({
 });
 
 //Get - Change Working Status
-// userSchema.methods.getStatus = function (type, workplace) {
-//   const user = this;
-//   let currAttendId = null;
-//   return Status.findOne({ userId: user._id })
-//     .then((status) => {
-//       currAttendId = status.attendId;
-//       if (type === "start") {
-//         return this.addAttendance(
-//           currAttendId,
-//           new Date().toLocaleDateString(),
-//           new Date(),
-//           workplace
-//         )
-//           .then((result) => {
-//             currAttendId = result._id;
-//             return Status.findOne({ userId: user._id });
-//           })
-//           .then((status) => {
-//             status.attendId = currAttendId;
-//             status.workplace = workplace;
-//             status.isWorking = true;
-//             return status.save();
-//           })
-//           .catch((err) => console.log(err));
-//       } else {
-//         return this.finishAttendance(currAttendId, new Date())
-//           .then((result) => {
-//             return Status.findOne({ userId: user._id });
-//           })
-//           .then((status) => {
-//             status.isWorking = false;
-//             status.workplace = "Chưa xác định";
-//             return status.save();
-//           })
-//           .catch((err) => console.log(err));
-//       }
-//     })
-//     .catch((err) => console.log(err));
-// };
 userSchema.methods.getStatus = function (type, workplace) {
+  const user = this;
   let currAttendId = null;
-  if (type === "start") {
-    Status.findOne({ userId: this._id })
-      .then((status) => {
-        currAttendId = status.attendId;
+  return Status.findOne({ userId: user._id })
+    .then((status) => {
+      currAttendId = status.attendId;
+      if (type === "start") {
         return this.addAttendance(
           currAttendId,
           new Date().toLocaleDateString(),
           new Date(),
           workplace
-        );
-      })
-      .then((result) => {
-        currAttendId = result._id;
-        return Status.findOne({ userId: this._id });
-      })
-      .then((status) => {
-        status.attendId = currAttendId;
-        status.workplace = workplace;
-        status.isWorking = true;
-        return status.save();
-      })
-      .catch((err) => console.log(err));
-  } else {
-    Status.findOne({ userId: this._id }).then((status) => {
-      currAttendId = status.attendId;
-      return this.finishAttendance(currAttendId, new Date())
-        .then((result) => {
-          return Status.findOne({ userId: user._id });
-        })
-        .then((status) => {
-          status.isWorking = false;
-          status.workplace = "Chưa xác định";
-          return status.save();
-        })
-        .catch((err) => console.log(err));
-    });
-  }
-  // .catch((err) => console.log(err));
+        )
+          .then((result) => {
+            currAttendId = result._id;
+            return Status.findOne({ userId: user._id });
+          })
+          .then((status) => {
+            status.attendId = currAttendId;
+            status.workplace = workplace;
+            status.isWorking = true;
+            return status.save();
+          })
+          .catch((err) => console.log(err));
+      } else {
+        return this.finishAttendance(currAttendId, new Date())
+          .then((result) => {
+            return Status.findOne({ userId: user._id });
+          })
+          .then((status) => {
+            status.isWorking = false;
+            status.workplace = "Chưa xác định";
+            return status.save();
+          })
+          .catch((err) => console.log(err));
+      }
+    })
+    .catch((err) => console.log(err));
 };
 
 // Stop Working
@@ -155,24 +114,14 @@ userSchema.methods.addAttendance = function (
 };
 
 // Get Attendance Detail Per Day
-// userSchema.methods.getAttendanceDetails = function () {
-//   return Status.findOne({ userId: this._id }).then((status) => {
-//     return Attendance.findById(status.attendId)
-//       .then((attendance) => {
-//         return attendance;
-//       })
-//       .catch((err) => console.log(err));
-//   });
-// };
 userSchema.methods.getAttendanceDetails = function () {
-  Status.findOne({ userId: this._id })
-    .then((status) => {
-      return Attendance.findById(status.attendId);
-    })
-    .then((attendance) => {
-      return attendance;
-    })
-    .catch((err) => console.log(err));
+  return Status.findOne({ userId: this._id }).then((status) => {
+    return Attendance.findById(status.attendId)
+      .then((attendance) => {
+        return attendance;
+      })
+      .catch((err) => console.log(err));
+  });
 };
 
 // Get All Attendance Statistic
@@ -188,14 +137,13 @@ userSchema.methods.getStatistic = function () {
           attend: true,
         });
       });
-
       return Absence.find({ userId: this._id }).then((absences) => {
         absences.sort((a, b) => {
           return new Date(a.date) - new Date(b.date);
         });
         absences.forEach((absence) => {
           statistics.push({
-            date: absence.date.toLocaleDateString(),
+            date: absence.date,
             reason: absence.reason,
             days: absence.days,
             attend: false,
@@ -206,6 +154,40 @@ userSchema.methods.getStatistic = function () {
         });
         return statistics;
       });
+    })
+    .catch((err) => console.log(err));
+};
+
+// Get All Attendance Statistic
+userSchema.methods.getWorkingStatistic = function () {
+  const workingstatistics = [];
+  // Get all attendance and absence
+  return Attendance.find({ userId: this._id })
+    .then((attendances) => {
+      attendances.forEach((attendance) => {
+        workingstatistics.push({
+          date: attendance.date,
+          details: attendance.details,
+          attend: true,
+        });
+      });
+      // return Absence.find({ userId: this._id }).then((absences) => {
+      //   absences.sort((a, b) => {
+      //     return new Date(a.date) - new Date(b.date);
+      //   });
+      //   absences.forEach((absence) => {
+      //     statistics.push({
+      //       date: absence.date,
+      //       reason: absence.reason,
+      //       days: absence.days,
+      //       attend: false,
+      //     });
+      //   });
+      // workingstatistics.sort((a, b) => {
+      //     return new Date(a.date) - new Date(b.date);
+      //   });
+      return workingstatistics;
+      // });
     })
     .catch((err) => console.log(err));
 };

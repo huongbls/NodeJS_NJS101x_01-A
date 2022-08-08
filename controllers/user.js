@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const Status = require("../models/status");
 const Attendance = require("../models/attendance");
+const user = require("../models/user");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
@@ -71,7 +72,25 @@ exports.postEditUser = (req, res, next) => {
 
 // Get all statistics of attendance
 exports.getStatistic = (req, res, next) => {
-  req.user.getStatistic().then((statistics) => {
+  const user = new User(req.user);
+  user.getStatistic().then((statistics) => {
+    console.log(statistics[1].details[0].startTime);
+    res.render("statistic", {
+      css: "statistic",
+      pageTitle: "Tra cứu thông tin",
+      user: req.user,
+      statistics: statistics,
+      type: "details",
+    });
+  });
+};
+
+// Get all statistics of attendance
+exports.getWorkingStatistic = (req, res, next) => {
+  const user = new User(req.user);
+  user.getWorkingStatistic().then((statistics) => {
+    // console.log(statistics);
+    console.log(statistics[0].details[0]);
     res.render("statistic", {
       css: "statistic",
       pageTitle: "Tra cứu thông tin",
@@ -85,7 +104,8 @@ exports.getStatistic = (req, res, next) => {
 // Get Statistic with Wildcard
 exports.getStatisticSearch = function (req, res, next) {
   const { type, search } = req.query;
-  req.user
+  const user = new User(req.user);
+  user
     .getStatistic()
     .then((statistics) => {
       var currStatistic = [],

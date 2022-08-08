@@ -1,6 +1,5 @@
 <h1>Thống kê dữ liệu giờ làm</h1>
-<div class="wildcard-container">
-    
+<div class="wildcard-container">   
     <form id="wildcard" action="/statistic-search" method="GET">
         <label for="date">Tìm kiếm theo:</label>
         <select name="type" id="field">
@@ -12,11 +11,30 @@
 </div>
 
 <div class="statistic-wrapper">
-    <% if (type == 'salary' && statistics.length == 0){ %>
-        <h2>Không có dữ liệu</h2>
-    <% }else{ %>
+    <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Ngày</th>
+        <th>Giờ bắt đầu</th>
+        <th>Giờ kết thúc</th>
+        <th>Nơi làm việc</th>
+        <th>Thời gian làm</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each statistics}}
+        <tr>
+          <td>{{tolocaledatestring date}}</td>
+          <td>{{details.startTime}}</td>
+          <td>{{details}}</td>
+          <td>{{details}}</td>
+          <td>{{tolocaledatestring date}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+    </table>
+
         <table>
-            <!-- BEGIN: TABLE HEAD -->
             <thead>
                 <tr>
                     <th>Ngày</th>
@@ -29,7 +47,7 @@
 
             <!-- END: TABLE HEAD -->
             <!-- BEGIN: TABLE BODY -->
-            <tbody>
+            {{!-- <tbody>
                 <% statistics.forEach(item => { %>
                     <% if(item.attend && item.details.length > 1){ %>
                         <!-- FIRST ROW -->
@@ -103,12 +121,12 @@
                     <% } %> 
                 <% }) %>
             </tbody>
-        </table>
+        </table> --}}
 
-    <%} %>
+
 </div>
-<% if(type == 'salary' && statistics.length > 0){ %>
+{{!-- <% if(type == 'salary' && statistics.length > 0){ %>
     <p>Thời gian làm thêm: <%= statistics.overTime.toFixed(1) %> - Thời gian làm thiếu: <%= statistics.underTime.toFixed(1) %></p>
     <h3>Tiền lương: <%= statistics.salary %></h3>
-<% } %>
+<% } %> --}}
 
