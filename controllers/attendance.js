@@ -11,23 +11,24 @@ exports.getAttendace = (req, res, next) => {
 };
 
 // Get Attendance Details Page
-exports.getAttendaceDetails = (req, res, next) => {
-  const user = new User(req.user);
-  user.getAttendanceDetails().then((attendance) => {
-    res.render("attendance-details", {
-      css: "attendance",
-      pageTitle: "Chi tiết công việc",
-      user: req.user,
-      attendance: attendance,
+exports.getAttendanceDetails = (req, res, next) => {
+  Attendance.findOne({ user: req.user._id })
+    .lean()
+    .then((attendance) => {
+      res.render("attendance-details", {
+        css: "attendance",
+        pageTitle: "Chi tiết công việc",
+        user: req.user,
+        attendance: attendance,
+      });
     });
-  });
 };
 
 // Post Attendance: Start - Stop
 exports.postAttendance = (req, res, next) => {
+  const user = new User(req.user);
   const type = req.query.type;
   const workplace = req.body.workplace;
-  const user = new User(req.user);
   // Change working status user
   user
     .getStatus(type, workplace)

@@ -20,11 +20,12 @@ router.get("/statistic-search", userController.getStatisticSearch);
 
 // Attendance Page
 router.get("/attendance", attendanceController.getAttendace);
-router.get("/attendance-details", attendanceController.getAttendaceDetails);
+router.get("/attendance-details", attendanceController.getAttendanceDetails);
 router.post("/attendance", attendanceController.postAttendance);
 
 // Absence Page
 router.get("/absence", absenceController.getAbsence);
+router.get("/absence-details", absenceController.getAbsenceDetails);
 router.post("/absence", absenceController.postAbsence);
 
 // Covid Page

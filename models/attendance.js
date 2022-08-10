@@ -16,7 +16,7 @@ const attendanceSchema = new Schema({
     {
       startTime: { type: Date },
       endTime: { type: Date },
-      workplace: { type: String, required: true },
+      workplace: { type: String },
     },
   ],
 });

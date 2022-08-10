@@ -30,7 +30,17 @@ app.engine(
         return number.getHours();
       },
       getMinutes: function (number) {
-        return number.getMinutes();
+        if (number.getMinutes() >= 10) {
+          return number.getMinutes();
+        } else {
+          return `0${number.getMinutes()}`;
+        }
+      },
+      subStract: function (number1, number2) {
+        return ((number1 - number2) / 3.6e6).toFixed();
+      },
+      sum: function (number1, number2) {
+        return number1 + number2;
       },
     },
   })
@@ -42,6 +52,8 @@ app.use(userController.loggedIn);
 
 // Define Static Folder
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 app.use(express.static(path.join(__dirname, "public")));
 
 // Setting routes

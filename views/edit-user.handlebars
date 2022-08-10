@@ -2,7 +2,11 @@
   <div class="card-deck">
     <div class="card bg-light">
       <div class="card-body text-center">
-        <img class="cover narrow" src="{{user.image}}" alt="{{user.name}}" />
+        <img
+          class="cover narrow mb-3"
+          src="{{user.image}}"
+          alt="{{user.name}}"
+        />
         <p>Thay đổi ảnh đại diện: </p>
         <form action="/edit-user" method="Post">
           <input type="text" name="image" id="image" />

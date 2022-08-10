@@ -1,51 +1,65 @@
 const Absence = require("../models/absence");
-const Attendance = require("../models/attendance");
 const User = require("../models/user");
 
 // GET Absence Page
 exports.getAbsence = (req, res, next) => {
-  const disabledDates = [];
-  // Get all the dates that the user has already taken an absence
-  Absence.find({ userId: req.user._id })
+  Absence.findOne({ userId: req.user._id })
     .lean()
-    .then((absences) => {
-      const absencesDates = absences.map((item) =>
-        item.date.toLocaleDateString()
-      );
-      disabledDates.push(...absencesDates);
-      return Attendance.find({ userId: req.user._id });
+    .then((absence) => {
+      // Check if user has no absence data
+      if (!absence) {
+        const newAbsence = new Absence({
+          userId: req.user._id,
+          registerLeave: [],
+        });
+        return newAbsence.save();
+      }
+      return absence;
     })
-    .then((attendance) => {
-      // Get all the dates that the user has already taken an attendance
-      const attendanceDates = attendance.map((item) =>
-        new Date(item.date).toLocaleDateString()
-      );
-      disabledDates.push(...attendanceDates);
-
+    .then((absence) => {
       res.render("absence", {
-        css: "absence",
-        pageTitle: "Đăng ký nghỉ phép",
+        pageTitle: "Đăng ký nghỉ",
         user: req.user,
-        disabledDates: disabledDates,
+        absence: absence,
       });
     })
     .catch((err) => console.log(err));
 };
 
-// POST Absence Page
+// Post Absence Details Page
 exports.postAbsence = (req, res, next) => {
-  const { type, date, hours, dates, reason } = req.body;
-  //Add the absence to the database
-  Absence.addAbsence(req.user._id, type, date, hours, dates, reason)
-    .then((result) => {
-      let delNum = type == 0 ? result.days : result.length;
-      return User.updateOne(
-        { _id: req.user._id },
-        { $inc: { annualLeave: -delNum } }
-      );
+  Absence.findOne({ userId: req.user._id })
+    .then((absence) => {
+      absence.registerLeave.push({
+        fromDate: req.body.fromDate,
+        toDate: req.body.toDate,
+        hours: req.body.hours,
+        reason: req.body.reason,
+      });
+      return absence.save();
     })
-    .then((result) => {
-      res.redirect("/absence");
+    .then((absence) => {
+      res.redirect("/absence-details");
+    })
+    .catch((err) => console.log(err));
+
+  User.updateOne({ userId: req.user._id });
+};
+
+// Get Absence Details Page
+exports.getAbsenceDetails = (req, res, next) => {
+  // Get Absence Details by User
+  Absence.findOne({ userId: req.user._id })
+    .lean()
+    .then((absence) => {
+      return absence;
+    })
+    .then((absence) => {
+      res.render("absence-details", {
+        pageTitle: "Nghỉ phép",
+        user: req.user,
+        absence: absence,
+      });
     })
     .catch((err) => console.log(err));
 };

@@ -1,7 +1,6 @@
 const User = require("../models/user");
 const Status = require("../models/status");
 const Attendance = require("../models/attendance");
-const user = require("../models/user");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
@@ -90,7 +89,7 @@ exports.getWorkingStatistic = (req, res, next) => {
   const user = new User(req.user);
   user.getWorkingStatistic().then((statistics) => {
     // console.log(statistics);
-    console.log(statistics[0].details[0]);
+    console.log(statistics);
     res.render("statistic", {
       css: "statistic",
       pageTitle: "Tra cứu thông tin",

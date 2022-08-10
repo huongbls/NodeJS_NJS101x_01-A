@@ -1,23 +1,81 @@
-{{#unless user.isWorking}}
-  <div class="start">
-    <h1>Bắt đầu công việc</h1>
-    <form action="/attendance?type=start" method="POST">
-      <select name="workplace" id="workplace" required>
-        <option value="Công ty">Công Ty</option>
-        <option value="Nhà">Nhà</option>
-        <option value="Khách Hàng">Khách Hàng</option>
-      </select>
-      <input type="submit" value="Bắt đầu" />
-    </form>
+<div class="card-deck mt-3">
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      {{#unless user.isWorking}}
+      <h6 class="card-text mb-3">Điểm danh bắt đầu</h6>
+      <form action="/attendance?type=start" method="POST">
+        <div class="form-group">
+          <label for="name">Họ và tên</label>
+          <input
+            type="text"
+            class="form-control"
+            name="name"
+            value="{{user.name}}"
+            disabled
+          />
+        </div>
+        <div class="form-group">
+          <label for="workplace">Nơi làm việc</label>
+            <select name="workplace" class="form-control" required>
+              <option value="Công ty">Công Ty</option>
+              <option value="Nhà">Nhà</option>
+              <option value="Khách Hàng">Khách Hàng</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-secondary">Check-in</button>
+      </form>
+      {{else}}
+      <h6 class="card-text mb-3">Kết thúc làm</h6>
+      <form action="/attendance?type=stop" method="POST">
+        <button type="submit" class="btn btn-secondary">Check-out</button>
+      </form>
+      {{/unless}}
+    </div>
   </div>
-  <div class="absence-wrapper">
-    <a href="/absence" class="btn">Đăng ký nghỉ phép</a>
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      <h6 class="card-text mb-3">Đăng ký nghỉ</h6>
+      <form action="/attendance?type=absence" method="POST">
+        <div class="form-group">
+          <label for="fromDate">Từ ngày</label>
+          <input
+            required
+            type="date"
+            class="form-control"
+            name="fromDate"
+          />
+        </div>
+        <div class="form-group">
+          <label for="toDate">Đến ngày</label>
+          <input
+            required
+            type="date"
+            class="form-control"
+            name="toDate"
+          />
+        </div>
+        <div class="form-group">
+          <label for="timeOfDay">Thời điểm nghỉ trong ngày</label>
+            <select name="timeOfDay" class="form-control" required>
+              <option value="" disabled="disabled" selected="true">Lựa chọn</option>
+              <option value="Nghỉ buổi sáng">Nghỉ buổi sáng</option>
+              <option value="Nghỉ buổi chiều">Nghỉ buổi chiều</option>
+              <option value="Nghỉ cả ngày">Nghỉ cả ngày</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label for="reason">Lý do xin nghỉ</label>
+          <input
+            required
+            type="text"
+            class="form-control"
+            name="reason"
+          />
+        </div>
+        <button type="submit" class="btn btn-secondary">Register</button>
+      </form>
+      </form>
+    </div>
   </div>
-{{else}}
-  <div class="stop">
-    <h1>Kết thúc công việc</h1>
-    <form action="/attendance?type=stop" method="POST">
-      <input type="submit" value="Kết thúc" />
-    </form>
-  </div>
-{{/unless}}
+</div>
+

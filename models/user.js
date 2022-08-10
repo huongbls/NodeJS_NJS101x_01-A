@@ -74,27 +74,13 @@ userSchema.methods.addAttendance = function (
 ) {
   if (attendId) {
     return Attendance.findById(attendId).then((attendance) => {
-      // Check if the attendance is not finished
-      if (date === attendance.date) {
+      if (attendance) {
         attendance.details.unshift({
           startTime: startTime,
           endTime: null,
           workplace: workplace,
         });
         return attendance.save();
-      } else {
-        const newAttend = new Attendance({
-          userId: this._id,
-          date: date,
-          details: [
-            {
-              startTime: startTime,
-              endTime: null,
-              workplace: workplace,
-            },
-          ],
-        });
-        return newAttend.save();
       }
     });
   } else {
@@ -137,13 +123,14 @@ userSchema.methods.getStatistic = function () {
           attend: true,
         });
       });
+
       return Absence.find({ userId: this._id }).then((absences) => {
         absences.sort((a, b) => {
           return new Date(a.date) - new Date(b.date);
         });
         absences.forEach((absence) => {
           statistics.push({
-            date: absence.date,
+            date: absence.date.toLocaleDateString(),
             reason: absence.reason,
             days: absence.days,
             attend: false,
@@ -154,40 +141,6 @@ userSchema.methods.getStatistic = function () {
         });
         return statistics;
       });
-    })
-    .catch((err) => console.log(err));
-};
-
-// Get All Attendance Statistic
-userSchema.methods.getWorkingStatistic = function () {
-  const workingstatistics = [];
-  // Get all attendance and absence
-  return Attendance.find({ userId: this._id })
-    .then((attendances) => {
-      attendances.forEach((attendance) => {
-        workingstatistics.push({
-          date: attendance.date,
-          details: attendance.details,
-          attend: true,
-        });
-      });
-      // return Absence.find({ userId: this._id }).then((absences) => {
-      //   absences.sort((a, b) => {
-      //     return new Date(a.date) - new Date(b.date);
-      //   });
-      //   absences.forEach((absence) => {
-      //     statistics.push({
-      //       date: absence.date,
-      //       reason: absence.reason,
-      //       days: absence.days,
-      //       attend: false,
-      //     });
-      //   });
-      // workingstatistics.sort((a, b) => {
-      //     return new Date(a.date) - new Date(b.date);
-      //   });
-      return workingstatistics;
-      // });
     })
     .catch((err) => console.log(err));
 };
