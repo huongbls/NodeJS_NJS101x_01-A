@@ -1,40 +1,43 @@
-<h1>Thống kê dữ liệu giờ làm</h1>
-<div class="wildcard-container">
-  <form id="wildcard" action="/statistic-search" method="GET">
-    <label for="date">Tìm kiếm theo:</label>
-    <select name="type" id="field">
-      <option value="date">Tháng/Ngày/Năm</option>
-    </select>
-    <input type="text" name="search" id="search" />
-    <input type="submit" value="Tìm" />
-  </form>
-</div>
-
-<div class="statistic-wrapper">
+<div class="container">
+  <h6>Thông tin giờ làm</h6>
+  <div>
+    <form action="/statistic-search" method="GET">
+      <label for="date">Tìm kiếm theo:</label>
+      <select name="type">
+        <option value="date">Tháng/Ngày/Năm</option>
+      </select>
+      <input type="text" name="search" />
+      <input type="submit" value="Tìm" />
+    </form>
+  </div>
   <table class="table">
     <thead class="thead-light">
       <tr>
         <th>Ngày</th>
+        <th>Nơi làm việc</th>
         <th>Giờ bắt đầu</th>
         <th>Giờ kết thúc</th>
-        <th>Nơi làm việc</th>
         <th>Thời gian làm</th>
       </tr>
     </thead>
     <tbody>
-      {{#each statistics}}
+      {{#each workingStatistics.details}}
         <tr>
-          <td>{{tolocaledatestring date}}</td>
+          <td>{{tolocaledatestring startTime}}</td>
+          <td>{{workplace}}</td>
           <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
           {{#if endTime}}
             <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+            <td>{{subStract endTime startTime}}</td>
           {{else}}
-            <td></td>
+            <td>-</td>
+            <td>-</td>
           {{/if}}
-          <td>{{workplace}}</td>
-          <td>{{subStract endTime startTime}}</td>
         </tr>
       {{/each}}
     </tbody>
   </table>
+  <hr />
+  <br />
+  <h6>Tổng giờ đã làm hôm nay:</h6>
 </div>

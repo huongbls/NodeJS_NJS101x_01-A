@@ -12,6 +12,11 @@ exports.getAttendace = (req, res, next) => {
 
 // Get Attendance Details Page
 exports.getAttendanceDetails = (req, res, next) => {
+  // const listToday = Attendance.details.find((date) => {
+  //   date = new Date();
+  // });
+  // console.log("listToday: " + listToday);
+  // Attendance.where({details: })
   Attendance.findOne({ user: req.user._id })
     .lean()
     .then((attendance) => {
@@ -20,6 +25,7 @@ exports.getAttendanceDetails = (req, res, next) => {
         pageTitle: "Chi tiết công việc",
         user: req.user,
         attendance: attendance,
+        // date: attendance.date,
       });
     });
 };

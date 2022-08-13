@@ -15,7 +15,7 @@ exports.getHome = (req, res, next) => {
 
 // Check if user is logged in to add new status
 exports.loggedIn = function (req, res, next) {
-  User.findById("62ee1fddb20dc11fb5c57a7c")
+  User.findById("62f45fe6fc989940dd6454b3")
     .lean()
     .then((user) => {
       req.user = user;
@@ -73,32 +73,33 @@ exports.postEditUser = (req, res, next) => {
 exports.getStatistic = (req, res, next) => {
   const user = new User(req.user);
   user.getStatistic().then((statistics) => {
-    console.log(statistics[1].details[0].startTime);
+    console.log(statistics[0]);
     res.render("statistic", {
       css: "statistic",
       pageTitle: "Tra cứu thông tin",
       user: req.user,
-      statistics: statistics,
+      workingStatistics: statistics[0],
+      absenceStatistics: statistics[1],
       type: "details",
     });
   });
 };
 
 // Get all statistics of attendance
-exports.getWorkingStatistic = (req, res, next) => {
-  const user = new User(req.user);
-  user.getWorkingStatistic().then((statistics) => {
-    // console.log(statistics);
-    console.log(statistics);
-    res.render("statistic", {
-      css: "statistic",
-      pageTitle: "Tra cứu thông tin",
-      user: req.user,
-      statistics: statistics,
-      type: "details",
-    });
-  });
-};
+// exports.getWorkingStatistic = (req, res, next) => {
+//   const user = new User(req.user);
+//   user.getWorkingStatistic().then((statistics) => {
+//     // console.log(statistics);
+//     console.log(statistics);
+//     res.render("statistic", {
+//       css: "statistic",
+//       pageTitle: "Tra cứu thông tin",
+//       user: req.user,
+//       statistics: statistics,
+//       type: "details",
+//     });
+//   });
+// };
 
 // Get Statistic with Wildcard
 exports.getStatisticSearch = function (req, res, next) {

@@ -42,6 +42,35 @@ app.engine(
       sum: function (number1, number2) {
         return number1 + number2;
       },
+      ifCond: function (v1, operator, v2, options) {
+        switch (operator) {
+          case "==":
+            return v1 == v2 ? options.fn(this) : options.inverse(this);
+          case "===":
+            return v1 === v2 ? options.fn(this) : options.inverse(this);
+          case "!=":
+            return v1 != v2 ? options.fn(this) : options.inverse(this);
+          case "!==":
+            return v1 !== v2 ? options.fn(this) : options.inverse(this);
+          case "<":
+            return v1 < v2 ? options.fn(this) : options.inverse(this);
+          case "<=":
+            return v1 <= v2 ? options.fn(this) : options.inverse(this);
+          case ">":
+            return v1 > v2 ? options.fn(this) : options.inverse(this);
+          case ">=":
+            return v1 >= v2 ? options.fn(this) : options.inverse(this);
+          case "&&":
+            return v1 && v2 ? options.fn(this) : options.inverse(this);
+          case "||":
+            return v1 || v2 ? options.fn(this) : options.inverse(this);
+          default:
+            return options.inverse(this);
+        }
+      },
+      setVariable: function (varName, varValue, options) {
+        options.data.root[varName] = varValue;
+      },
     },
   })
 );
@@ -73,7 +102,7 @@ dbConnect()
             salaryScale: 5000000,
             startDate: new Date("2022-05-31"),
             department: "IT",
-            annualLeave: 5,
+            annualLeave: 12,
             image:
               "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc_NEc8A16sOFBrLMoOcBUwFZlZ84A9UzfRw&usqp=CAU",
           });

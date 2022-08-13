@@ -115,6 +115,7 @@ userSchema.methods.getStatistic = function () {
   const statistics = [];
   // Get all attendance and absence
   return Attendance.find({ userId: this._id })
+    .lean()
     .then((attendances) => {
       attendances.forEach((attendance) => {
         statistics.push({
@@ -124,23 +125,23 @@ userSchema.methods.getStatistic = function () {
         });
       });
 
-      return Absence.find({ userId: this._id }).then((absences) => {
-        absences.sort((a, b) => {
-          return new Date(a.date) - new Date(b.date);
-        });
-        absences.forEach((absence) => {
-          statistics.push({
-            date: absence.date.toLocaleDateString(),
-            reason: absence.reason,
-            days: absence.days,
-            attend: false,
+      return Absence.find({ userId: this._id })
+        .lean()
+        .then((absences) => {
+          absences.sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
           });
+          absences.forEach((absence) => {
+            statistics.push({
+              registerLeave: absence.registerLeave,
+              attend: false,
+            });
+          });
+          statistics.sort((a, b) => {
+            return new Date(a.date) - new Date(b.date);
+          });
+          return statistics;
         });
-        statistics.sort((a, b) => {
-          return new Date(a.date) - new Date(b.date);
-        });
-        return statistics;
-      });
     })
     .catch((err) => console.log(err));
 };

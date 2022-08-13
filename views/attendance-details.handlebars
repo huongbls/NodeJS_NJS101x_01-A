@@ -14,6 +14,8 @@
     </thead>
     <tbody>
       {{#each attendance.details}}
+        {{setVariable "date" "2022-08-10"}}
+        {{!-- {{#ifCond date "<" tolocaledatestring startTime}} --}}
         <tr>
           <td>{{tolocaledatestring startTime}}</td>
           <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
@@ -21,6 +23,7 @@
           <td>{{workplace}}</td>
           <td>{{subStract endTime startTime}}</td>
         </tr>
+        {{!-- {{/ifCond}} --}}
       {{/each}}
     </tbody>
   </table>

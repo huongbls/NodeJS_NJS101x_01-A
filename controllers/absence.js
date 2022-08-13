@@ -10,6 +10,7 @@ exports.getAbsence = (req, res, next) => {
       if (!absence) {
         const newAbsence = new Absence({
           userId: req.user._id,
+          date: new Date(),
           registerLeave: [],
         });
         return newAbsence.save();
@@ -30,6 +31,7 @@ exports.getAbsence = (req, res, next) => {
 exports.postAbsence = (req, res, next) => {
   Absence.findOne({ userId: req.user._id })
     .then((absence) => {
+      console.log(absence);
       absence.registerLeave.push({
         fromDate: req.body.fromDate,
         toDate: req.body.toDate,
@@ -43,7 +45,20 @@ exports.postAbsence = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 
-  User.updateOne({ userId: req.user._id });
+  const fromDate = new Date(req.body.fromDate);
+  const toDate = new Date(req.body.toDate);
+  const hours = req.body.hours;
+  const dayLeaveRequest =
+    ((Math.floor((toDate - fromDate) / (1000 * 60 * 60 * 24)) + 1) * hours) / 8;
+  const annualLeave = req.user.annualLeave;
+  const daysRemain = annualLeave - dayLeaveRequest;
+
+  User.updateOne({ annualLeave: daysRemain }, function (err, res) {
+    if (err) throw err;
+    //update thành công
+    console.log(res);
+    //trả về document đã cập nhật.
+  });
 };
 
 // Get Absence Details Page
