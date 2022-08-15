@@ -12,29 +12,37 @@ exports.getAttendace = (req, res, next) => {
 
 // Get Attendance Details Page
 exports.getAttendanceDetails = (req, res, next) => {
-  // const listToday = Attendance.details.find((date) => {
-  //   date = new Date();
-  // });
-  // console.log("listToday: " + listToday);
-  // Attendance.where({details: })
-  Attendance.findOne({ user: req.user._id })
+  const today = new Date().toLocaleDateString();
+  Attendance.findOne({ userId: req.user._id, date: today })
     .lean()
     .then((attendance) => {
+      let totalhour = 0;
+      if (attendance) {
+        attendance.details.forEach((item) => {
+          // Tính tổng giờ làm của một ngày
+          if (item.endTime && item.startTime) {
+            const sessionWorkingHour = (
+              (item.endTime - item.startTime) /
+              3.6e6
+            ).toFixed(1);
+            totalhour += parseFloat(sessionWorkingHour);
+          }
+        });
+      }
       res.render("attendance-details", {
-        css: "attendance",
         pageTitle: "Chi tiết công việc",
-        user: req.user,
         attendance: attendance,
-        // date: attendance.date,
+        totalhour: totalhour,
       });
-    });
+    })
+    .catch((err) => console.log(err));
 };
 
 // Post Attendance: Start - Stop
 exports.postAttendance = (req, res, next) => {
-  const user = new User(req.user);
   const type = req.query.type;
   const workplace = req.body.workplace;
+  const user = new User(req.user);
   // Change working status user
   user
     .getStatus(type, workplace)

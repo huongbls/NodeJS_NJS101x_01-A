@@ -37,7 +37,7 @@ app.engine(
         }
       },
       subStract: function (number1, number2) {
-        return ((number1 - number2) / 3.6e6).toFixed();
+        return ((number1 - number2) / 3.6e6).toFixed(1);
       },
       sum: function (number1, number2) {
         return number1 + number2;
@@ -67,9 +67,6 @@ app.engine(
           default:
             return options.inverse(this);
         }
-      },
-      setVariable: function (varName, varValue, options) {
-        options.data.root[varName] = varValue;
       },
     },
   })

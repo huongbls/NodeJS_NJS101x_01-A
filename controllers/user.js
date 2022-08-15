@@ -4,10 +4,9 @@ const Attendance = require("../models/attendance");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
+  console.log(req.user);
   const user = req.user;
-  console.log(user);
   res.render("home", {
-    css: "home",
     user: user,
     pageTitle: "Trang chủ",
   });
@@ -15,7 +14,7 @@ exports.getHome = (req, res, next) => {
 
 // Check if user is logged in to add new status
 exports.loggedIn = function (req, res, next) {
-  User.findById("62f45fe6fc989940dd6454b3")
+  User.findById("62f7766d4d90b2028b233de2")
     .lean()
     .then((user) => {
       req.user = user;
@@ -47,7 +46,6 @@ exports.getEditUser = (req, res, next) => {
   User.findById(req.params.userId)
     .lean()
     .then((user) => {
-      console.log(user);
       res.render("edit-user", {
         css: "edit-user",
         pageTitle: user.name,
@@ -72,41 +70,39 @@ exports.postEditUser = (req, res, next) => {
 // Get all statistics of attendance
 exports.getStatistic = (req, res, next) => {
   const user = new User(req.user);
+  let salaryTotalHour = 0;
+  let salaryOvertime = 0;
+  let salaryScale = user.salaryScale;
+  let totalSalary = 0;
   user.getStatistic().then((statistics) => {
-    console.log(statistics[0]);
+    // console.log(statistics);
+    statistics.forEach((item) => {
+      if (item.totalHour) {
+        salaryTotalHour += item.totalHour;
+      }
+      if (item.overTime) {
+        salaryOvertime += item.overTime;
+      }
+    });
+
     res.render("statistic", {
-      css: "statistic",
       pageTitle: "Tra cứu thông tin",
       user: req.user,
-      workingStatistics: statistics[0],
-      absenceStatistics: statistics[1],
+      statistics: statistics,
+      salaryTotalHour: salaryTotalHour,
+      salaryOvertime: salaryOvertime,
+      totalSalary: user.salaryScale * 3000000 + salaryOvertime * 200000,
       type: "details",
     });
   });
 };
 
-// Get all statistics of attendance
-// exports.getWorkingStatistic = (req, res, next) => {
-//   const user = new User(req.user);
-//   user.getWorkingStatistic().then((statistics) => {
-//     // console.log(statistics);
-//     console.log(statistics);
-//     res.render("statistic", {
-//       css: "statistic",
-//       pageTitle: "Tra cứu thông tin",
-//       user: req.user,
-//       statistics: statistics,
-//       type: "details",
-//     });
-//   });
-// };
-
 // Get Statistic with Wildcard
 exports.getStatisticSearch = function (req, res, next) {
   const { type, search } = req.query;
-  const user = new User(req.user);
-  user
+  req.user
     .getStatistic()
+    .lean()
     .then((statistics) => {
       var currStatistic = [],
         attendStatistic = [],

@@ -24,8 +24,8 @@
           />
         </div>
         <div class="form-group">
-          <label for="hours">Số nghỉ nghỉ</label>
-            <select name="hours" class="form-control" required>
+          <label for="hours">Số giờ nghỉ</label>
+            <select name="hours" id="hours" class="form-control" required>
               <option value="" disabled="disabled" selected="true">Lựa chọn</option>
               <option value="1">1</option>
               <option value="2">2</option>
@@ -38,12 +38,36 @@
             </select>
         </div>
         <div class="form-group">
+          <label for="fromHour">Từ giờ</label>
+          <input
+            required
+            type="time"
+            class="form-control"
+            id="fromHour"
+            name="fromHour"
+            min="08:00"
+            max="17:00"
+          />
+        </div>
+        <div class="form-group">
+          <label for="toHour">Đến giờ</label>
+          <input
+            type="time"
+            class="form-control"
+            id="toHour"
+            name="toHour"
+            min="08:00"
+            max="17:00"
+          />
+        </div>
+        <div class="form-group">
           <label for="reason">Lý do xin nghỉ</label>
           <input
             required
             type="text"
             class="form-control"
             name="reason"
+            id="reason"
           />
         </div>
         <button type="submit" class="btn btn-secondary">Register</button>
@@ -74,7 +98,7 @@
           />
         </div>
         <div class="form-group">
-          <label for="hours">Số nghỉ nghỉ</label>
+          <label for="hours">Số giờ nghỉ</label>
             <select name="hours" class="form-control" disabled>
               <option value="" disabled="disabled" selected="true">Lựa chọn</option>
               <option value="1">1</option>
@@ -86,6 +110,26 @@
               <option value="7">7</option>
               <option value="8">8</option>
             </select>
+        </div>
+        <div class="form-group">
+          <label for="fromHour">Từ giờ</label>
+          <input
+            disabled
+            type="time"
+            class="form-control"
+            name="fromHour"
+            id="fromHour"
+          />
+        </div>
+        <div class="form-group">
+          <label for="toHour">Đến giờ</label>
+          <input
+            disabled
+            type="time"
+            class="form-control"
+            name="toHour"
+            id="toHour"
+          />
         </div>
         <div class="form-group">
           <label for="reason">Lý do xin nghỉ</label>
@@ -104,3 +148,11 @@
     {{/if}}
   </div>
 </div>
+
+<script type="text/javascript">
+const hours = document.getElementById("hours");
+const fromHour = document.getElementById("fromHour");
+const toHour = document.getElementById("toHour");
+
+toHour.value = "12:00 am";
+</script>

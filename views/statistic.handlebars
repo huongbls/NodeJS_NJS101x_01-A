@@ -10,34 +10,85 @@
       <input type="submit" value="Tìm" />
     </form>
   </div>
-  <table class="table">
+  <table class="table table-bordered">
     <thead class="thead-light">
       <tr>
         <th>Ngày</th>
-        <th>Nơi làm việc</th>
+        <th>Nơi làm</th>
         <th>Giờ bắt đầu</th>
         <th>Giờ kết thúc</th>
-        <th>Thời gian làm</th>
+        <th>Thời gian làm (hr)</th>
+        <th>Nghỉ phép (hr)</th>
+        <th>Tổng giờ làm (hr)(*)</th>
+        <th>Overtime (hr)</th>
       </tr>
     </thead>
     <tbody>
-      {{#each workingStatistics.details}}
-        <tr>
-          <td>{{tolocaledatestring startTime}}</td>
-          <td>{{workplace}}</td>
-          <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
-          {{#if endTime}}
-            <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
-            <td>{{subStract endTime startTime}}</td>
-          {{else}}
+      {{#each statistics}}
+        {{#if details}}
+        {{#each details}}
+          <tr>
+            {{#ifCond @index '===' 0}}
+            <td rowspan="{{../details.length}}">{{tolocaledatestring ../date}}</td>
+            {{/ifCond}}
+            <td>{{workplace}}</td>
+            <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
+            {{#if endTime}}
+              <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+              <td>{{subStract endTime startTime}}</td>
+            {{else}}
+              <td>-</td>
+              <td>-</td>
+            {{/if}}
+            {{#ifCond @index '===' 0}} 
+            {{#if ../leaveHour}}
+            <td rowspan="{{../details.length}}">{{../leaveHour}}</td>
+            <td rowspan="{{../details.length}}">{{../totalHour}}</td>
+            {{else}}
+            <td rowspan="{{../details.length}}">-</td>
+            <td rowspan="{{../details.length}}">{{../totalWorkingHour}}</td>
+            {{/if}}
+            <td rowspan="{{../details.length}}">{{../overTime}}</td>
+            {{/ifCond}}
+          </tr>
+        {{/each}}
+        {{else}}
+        {{#if leaveHour}}
+          <tr>
+            <td>{{tolocaledatestring date}}</td>
             <td>-</td>
             <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>{{leaveHour}}</td>
+            <td>{{totalHour}}</td>
+            <td>-</td>
+          </tr>
           {{/if}}
-        </tr>
+        {{/if}} 
       {{/each}}
     </tbody>
   </table>
-  <hr />
+  <p>(*) Tổng giờ làm trong ngày đã bao gồm giờ nghỉ phép</p>
+  <h6>Lương tháng</h6>
   <br />
-  <h6>Tổng giờ đã làm hôm nay:</h6>
+  <table class="table table-bordered">
+    <thead class="thead-light">
+      <tr>
+        <th>Tháng</th>
+        <th>Tổng giờ làm</th>
+        <th>Tổng giờ OT</th>
+        <th>Lương</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Tháng 8</td>
+        <td>{{salaryTotalHour}}</td>
+        <td>{{salaryOvertime}}</td>
+        <td>{{totalSalary}}</td>
+      </tr>
+    </tbody>
+  </table>
+
 </div>

@@ -1,33 +1,35 @@
 <div class="container">
-  <h4>Ngày: {{tolocaledatestring attendance.date}}</h4>
+  <h4>Ngày: {{attendance.date}}</h4>
   <a href="/attendance">Quay lại</a>
   <h6 class="mt-3">Thông tin giờ làm, nơi làm</h6>
   <table class="table">
     <thead class="thead-light">
       <tr>
         <th>Ngày</th>
+        <th>Nơi làm</th>
         <th>Giờ bắt đầu</th>
         <th>Giờ kết thúc</th>
-        <th>Nơi làm</th>
         <th>Thời gian làm</th>
       </tr>
     </thead>
     <tbody>
       {{#each attendance.details}}
-        {{setVariable "date" "2022-08-10"}}
-        {{!-- {{#ifCond date "<" tolocaledatestring startTime}} --}}
         <tr>
           <td>{{tolocaledatestring startTime}}</td>
-          <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
-          <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
           <td>{{workplace}}</td>
-          <td>{{subStract endTime startTime}}</td>
+          <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
+          {{#if endTime}}
+            <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+            <td>{{subStract endTime startTime}}</td>
+          {{else}}
+            <td>-</td>
+            <td>-</td>
+          {{/if}}
         </tr>
-        {{!-- {{/ifCond}} --}}
       {{/each}}
     </tbody>
   </table>
   <hr />
   <br />
-  <h6>Tổng giờ đã làm hôm nay:</h6>
+  <h6>Tổng giờ đã làm hôm nay: {{totalhour}} hrs</h6>
 </div>

@@ -74,13 +74,27 @@ userSchema.methods.addAttendance = function (
 ) {
   if (attendId) {
     return Attendance.findById(attendId).then((attendance) => {
-      if (attendance) {
+      // Check if the attendance is not finished
+      if (date === attendance.date) {
         attendance.details.unshift({
           startTime: startTime,
           endTime: null,
           workplace: workplace,
         });
         return attendance.save();
+      } else {
+        const newAttend = new Attendance({
+          userId: this._id,
+          date: date,
+          details: [
+            {
+              startTime: startTime,
+              endTime: null,
+              workplace: workplace,
+            },
+          ],
+        });
+        return newAttend.save();
       }
     });
   } else {
@@ -110,33 +124,94 @@ userSchema.methods.getAttendanceDetails = function () {
   });
 };
 
+const dateRange = function (startDate, endDate, steps = 1) {
+  const dateArray = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= new Date(endDate)) {
+    dateArray.push(new Date(currentDate));
+    // Use UTC date to prevent problems with time zones and DST
+    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
+  }
+  return dateArray;
+};
+
 // Get All Attendance Statistic
 userSchema.methods.getStatistic = function () {
-  const statistics = [];
+  let statistics = [];
+  const dateArr = dateRange(this.startDate, new Date(), 1);
+  dateArr.forEach((date) => {
+    statistics.push({ date: date });
+  });
   // Get all attendance and absence
-  return Attendance.find({ userId: this._id })
+  return Absence.find({ userId: this._id })
     .lean()
-    .then((attendances) => {
-      attendances.forEach((attendance) => {
-        statistics.push({
-          date: attendance.date,
-          details: attendance.details,
-          attend: true,
+    .then((absences) => {
+      absences.forEach((absence) => {
+        absence.registerLeave.forEach((leave) => {
+          statistics.forEach((object) => {
+            if (
+              object.date.toLocaleDateString() ===
+              leave.fromDate.toLocaleDateString()
+            ) {
+              let leaveHour = 0;
+              const leaveFromHour = new Date(`1900-01-01 ${leave.fromHour}`);
+              const leaveToHour = new Date(`1900-01-01 ${leave.toHour}`);
+              leaveHour = parseFloat(
+                ((leaveToHour - leaveFromHour) / 3.6e6).toFixed(1)
+              );
+              Object.assign(
+                object,
+                { leaveHour: leaveHour },
+                { totalHour: leaveHour }
+              );
+            }
+          });
         });
+        return statistics;
       });
 
-      return Absence.find({ userId: this._id })
+      return Attendance.find({ userId: this._id })
         .lean()
-        .then((absences) => {
-          absences.sort((a, b) => {
-            return new Date(a.date) - new Date(b.date);
-          });
-          absences.forEach((absence) => {
-            statistics.push({
-              registerLeave: absence.registerLeave,
-              attend: false,
+        .then((attendances) => {
+          attendances.forEach((attendance) => {
+            let totalWorkingHour = 0;
+            if (attendance) {
+              attendance.details.forEach((item) => {
+                // Tính tổng giờ làm của một ngày
+                if (item.endTime && item.startTime) {
+                  const sessionWorkingHour = (
+                    (item.endTime - item.startTime) /
+                    3.6e6
+                  ).toFixed(1);
+                  totalWorkingHour += parseFloat(sessionWorkingHour);
+                }
+              });
+            }
+            statistics.forEach((object) => {
+              if (
+                attendance.details.length > 0 &&
+                object.date.toLocaleDateString() === attendance.date
+              ) {
+                const leaveHour = object.leaveHour;
+                Object.assign(
+                  object,
+                  { details: attendance.details },
+                  { totalWorkingHour: totalWorkingHour },
+                  {
+                    totalHour: leaveHour
+                      ? totalWorkingHour + leaveHour
+                      : totalWorkingHour,
+                  },
+                  {
+                    overTime: leaveHour
+                      ? Math.max(totalWorkingHour + leaveHour - 8, 0)
+                      : Math.max(totalWorkingHour - 8, 0),
+                  }
+                );
+              }
             });
           });
+
           statistics.sort((a, b) => {
             return new Date(a.date) - new Date(b.date);
           });
