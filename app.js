@@ -13,7 +13,10 @@ const MONGODB_URI =
   "mongodb+srv://test:Nj28g2UmFeAYdDAe@funixnjs101xcluster.hlmi1es.mongodb.net/shop";
 
 const app = express();
-const store = new MongoDBStore({ uri: MONGODB_URI, collection: "sessions" });
+const store = new MongoDBStore({
+  uri: MONGODB_URI,
+  collection: "sessions",
+});
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -42,19 +45,8 @@ app.use((req, res, next) => {
       req.user = user;
       next();
     })
-    .catch((err) => {
-      console.log(err);
-    });
+    .catch((err) => console.log(err));
 });
-
-// app.use((req, res, next) => {
-//   User.findById("62e4fc90cfd936a015fc4587")
-//     .then((user) => {
-//       req.user = user;
-//       next();
-//     })
-//     .catch((err) => console.log(err));
-// });
 
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
@@ -65,18 +57,6 @@ app.use(errorController.get404);
 mongoose
   .connect(MONGODB_URI)
   .then((result) => {
-    User.findOne().then((user) => {
-      if (!user) {
-        const user = new User({
-          name: "Max",
-          email: "max@test.com",
-          cart: {
-            items: [],
-          },
-        });
-        user.save();
-      }
-    });
     app.listen(3000);
   })
   .catch((err) => {
