@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/huongbls/NodeJS_NJS101x_01-A#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.0",
     "connect-mongodb-session": "^3.1.1",
     "ejs": "^3.1.8",
