@@ -1,11 +1,18 @@
 const bcrypt = require("bcryptjs");
+
 const User = require("../models/user");
 
 exports.getLogin = (req, res, next) => {
+  let message = req.flash("error");
+  if (message.length > 0) {
+    message = message[0];
+  } else {
+    message = null;
+  }
   res.render("auth/login", {
     path: "/login",
     pageTitle: "Login",
-    errorMessage: req.flash("error"),
+    errorMessage: message,
   });
 };
 
@@ -29,11 +36,10 @@ exports.postLogin = (req, res, next) => {
         .compare(password, user.password)
         .then((doMatch) => {
           if (doMatch) {
-            req.session.isLoggedIn = true; //sử dụng middleware session
+            req.session.isLoggedIn = true;
             req.session.user = user;
             return req.session.save((err) => {
-              console.log(err);
-              return res.redirect("/");
+              res.redirect("/");
             });
           }
           res.redirect("/login");
