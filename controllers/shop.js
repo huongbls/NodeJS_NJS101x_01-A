@@ -99,7 +99,7 @@ exports.postOrder = (req, res, next) => {
       const order = new Order({
         // tạo một đối tượng order mới
         user: {
-          name: req.user.name, //req.user là một đối tượng user đầy đủ được tìm nạp từ database
+          email: req.user.email, //req.user là một đối tượng user đầy đủ được tìm nạp từ database
           userId: req.user, // để mongoose sẽ chọn id từ đối tượng req.user
         },
         products: products,
