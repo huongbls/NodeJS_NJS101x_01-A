@@ -1,16 +1,6 @@
 const User = require("../models/user");
 const Attendance = require("../models/attendance");
 
-// Get Home Page
-exports.getHome = (req, res, next) => {
-  console.log(req.user);
-  const user = req.user;
-  res.render("home", {
-    user: user,
-    pageTitle: "Trang chủ",
-  });
-};
-
 // Check if user is logged in to add new attendance
 exports.loggedIn = function (req, res, next) {
   User.findById("62f7766d4d90b2028b233de2")
@@ -22,14 +12,27 @@ exports.loggedIn = function (req, res, next) {
     .catch((err) => console.log(err));
 };
 
+// Get Home Page
+exports.getHome = (req, res, next) => {
+  console.log(req.user);
+  const user = req.user;
+  res.render("home", {
+    user: user,
+    pageTitle: "Trang chủ",
+    active: { home: true },
+  });
+};
+
 // GEt Edit User Page
 exports.getEditUser = (req, res, next) => {
+  console.log(req.params.userId);
   User.findById(req.params.userId)
     .lean()
     .then((user) => {
       res.render("edit-user", {
         pageTitle: user.name,
         user: user,
+        active: { user: true },
       });
     })
     .catch((err) => console.log(err));
@@ -57,6 +60,7 @@ exports.getWorkingHourStatistic = (req, res, next) => {
         pageTitle: "Thông tin giờ làm",
         user: req.user,
         workingHourStatistic: statistic,
+        active: { record: true },
       });
     })
     .catch((err) => console.log(err));
@@ -131,6 +135,7 @@ exports.getSalaryStatistic = (req, res, next) => {
         pageTitle: "Thông tin bảng lương",
         user: req.user,
         salaryStatistic: salaryStatistic,
+        active: { record: true },
       });
     })
     .catch((err) => console.log(err));
@@ -154,6 +159,7 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
         pageTitle: "Tra cứu thông tin giờ làm",
         user: req.user,
         workingHourStatistic: currStatistic,
+        active: { record: true },
       });
     })
     .catch((err) => {
@@ -245,7 +251,15 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
         searchMonth: `${
           searchMonth.getUTCMonth() + 1
         }/${searchMonth.getUTCFullYear()}`,
+        active: { record: true },
       });
     })
     .catch((err) => console.log(err));
+};
+
+exports.getAbout = (req, res, next) => {
+  res.render("about", {
+    pageTitle: "Giới thiệu",
+    active: { about: true },
+  });
 };

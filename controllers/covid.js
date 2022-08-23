@@ -19,10 +19,11 @@ exports.getCovid = (req, res, next) => {
     })
     .then((covid) => {
       res.render("covid", {
-        css: "covid",
+        path: "/covid",
         pageTitle: "Thông tin Covid",
         user: req.user,
         vaccine: covid.vaccine,
+        active: { covid: true },
       });
     })
     .catch((err) => console.log(err));
@@ -74,10 +75,11 @@ exports.getCovidDetails = (req, res, next) => {
     })
     .then((covid) => {
       res.render(`covid-details`, {
-        css: "covid-details",
+        path: "/covid-details",
         pageTitle: "Thông tin Covid",
         user: req.user,
         covid: covid,
+        active: { covid: true },
       });
     })
     .catch((err) => console.log(err));

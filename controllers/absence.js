@@ -18,10 +18,10 @@ exports.getAbsence = (req, res, next) => {
     })
     .then((absence) => {
       res.render("absence", {
-        path: "/absence",
         pageTitle: "Đăng ký nghỉ",
         user: req.user,
         absence: absence,
+        active: { timesheet: true },
       });
     })
     .catch((err) => console.log(err));
@@ -81,6 +81,7 @@ exports.getAbsenceDetails = (req, res, next) => {
         pageTitle: "Nghỉ phép",
         user: req.user,
         absence: absence,
+        active: { timesheet: true },
       });
     })
     .catch((err) => console.log(err));

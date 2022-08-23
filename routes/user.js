@@ -12,6 +12,9 @@ router.get("/", userController.getHome);
 router.get("/edit-user/:userId", userController.getEditUser);
 router.post("/edit-user", userController.postEditUser);
 
+// About Page
+router.get("/about", userController.getAbout);
+
 // Statistic Page
 router.get("/workingHourStatistic", userController.getWorkingHourStatistic);
 router.get("/salaryStatistic", userController.getSalaryStatistic);

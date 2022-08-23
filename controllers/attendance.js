@@ -24,6 +24,7 @@ exports.getAttendace = (req, res, next) => {
         pageTitle: "Điểm danh",
         user: req.user,
         date: new Date(),
+        active: { timesheet: true },
       });
     })
     .catch((err) => console.log(err));
@@ -96,6 +97,7 @@ exports.getAttendanceDetails = (req, res, next) => {
         pageTitle: "Chi tiết công việc",
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
+        active: { timesheet: true },
       });
     })
     .catch((err) => console.log(err));

@@ -99,7 +99,7 @@ dbConnect()
           const user = new User({
             name: "Nguyễn Văn A",
             dob: new Date("2000-01-01"),
-            salaryScale: 5000000,
+            salaryScale: 1.0,
             startDate: new Date("2022-05-31"),
             department: "IT",
             annualLeave: 12,
