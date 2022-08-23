@@ -42,6 +42,9 @@ app.engine(
       sum: function (number1, number2) {
         return number1 + number2;
       },
+      convertLeaveHourtoDay: function (hour) {
+        return (hour / 8).toFixed(1);
+      },
       ifCond: function (v1, operator, v2, options) {
         switch (operator) {
           case "==":

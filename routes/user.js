@@ -13,10 +13,14 @@ router.get("/edit-user/:userId", userController.getEditUser);
 router.post("/edit-user", userController.postEditUser);
 
 // Statistic Page
-// router.get("/statistic", userController.getStatistic);
-router.get("/statistic", userController.getStatistic);
-router.get("/statistic-search", userController.getStatisticSearch);
-router.post("/statistic", userController.postStatisticSalary);
+router.get("/workingHourStatistic", userController.getWorkingHourStatistic);
+router.get("/salaryStatistic", userController.getSalaryStatistic);
+router.get(
+  "/workingHourStatistic-search",
+  userController.getWorkingHourStatisticSearch
+);
+router.get("/salaryStatistic-search", userController.getSalaryStatisticSearch);
+// router.post("/statistic", userController.postStatisticSalary);
 
 // Attendance Page
 router.get("/attendance", attendanceController.getAttendace);

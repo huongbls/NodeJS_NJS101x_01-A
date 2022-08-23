@@ -3,36 +3,27 @@ const User = require("../models/user");
 
 // Get Start Working Page
 exports.getAttendace = (req, res, next) => {
-  res.render("attendance", {
-    css: "attendance",
-    pageTitle: "Điểm danh",
-    user: req.user,
-  });
-};
-
-// Get Attendance Details Page
-exports.getAttendanceDetails = (req, res, next) => {
-  const today = new Date().toLocaleDateString();
-  Attendance.findOne({ userId: req.user._id, date: today })
+  Attendance.findOne({
+    userId: req.user._id,
+    date: new Date().toLocaleDateString(),
+  })
     .lean()
-    .then((attendance) => {
-      let totalhour = 0;
-      if (attendance) {
-        attendance.details.forEach((item) => {
-          // Tính tổng giờ làm của một ngày
-          if (item.endTime && item.startTime) {
-            const sessionWorkingHour = (
-              (item.endTime - item.startTime) /
-              3.6e6
-            ).toFixed(1);
-            totalhour += parseFloat(sessionWorkingHour);
-          }
+    .then((result) => {
+      if (!result) {
+        const newAttendance = new Attendance({
+          userId: req.user._id,
+          date: new Date().toLocaleDateString(),
+          details: [],
         });
+        return newAttendance.save();
       }
-      res.render("attendance-details", {
-        pageTitle: "Chi tiết công việc",
-        attendance: attendance,
-        totalhour: totalhour,
+      return result;
+    })
+    .then((attendance) => {
+      res.render("attendance", {
+        pageTitle: "Điểm danh",
+        user: req.user,
+        date: new Date(),
       });
     })
     .catch((err) => console.log(err));
@@ -43,14 +34,69 @@ exports.postAttendance = (req, res, next) => {
   const type = req.query.type;
   const workplace = req.body.workplace;
   const user = new User(req.user);
-  // Change working status user
-  user
-    .getStatus(type, workplace)
-    .then((status) => {
-      if (type === "start") {
+  if (type === "start") {
+    Attendance.findOne({
+      userId: req.user._id,
+      date: new Date().toLocaleDateString(),
+    })
+      .then((attendance) => {
+        attendance.details.unshift({
+          startTime: new Date(),
+          endTime: null,
+          workplace: req.body.workplace,
+        });
+        return attendance.save();
+      })
+      .then((status) => {
         res.redirect("/");
+      })
+      .catch((err) => console.log(err));
+
+    User.findByIdAndUpdate(req.user._id, {
+      isWorking: true,
+      workplace: req.body.workplace,
+    }).catch((err) => console.log(err));
+  } else if (type === "stop") {
+    Attendance.findOne({
+      userId: req.user._id,
+      date: new Date().toLocaleDateString(),
+    })
+      .then((attendance) => {
+        attendance.details[0].endTime = new Date();
+        return attendance.save();
+      })
+      .then((status) => {
+        res.redirect("/attendance-details");
+      })
+      .catch((err) => console.log(err));
+
+    User.findByIdAndUpdate(req.user._id, {
+      isWorking: false,
+      workplace: "Chưa xác định",
+    }).catch((err) => console.log(err));
+  }
+};
+
+// Get Attendance Details Page
+exports.getAttendanceDetails = (req, res, next) => {
+  const today = new Date().toLocaleDateString();
+  Attendance.findOne({ userId: req.user._id, date: today })
+    .lean()
+    .then((attendance) => {
+      let totalWorkingHour = 0;
+      if (attendance) {
+        attendance.details.forEach((item) => {
+          totalWorkingHour += Attendance.calcTotalWorkingHour(
+            item.startTime,
+            item.endTime
+          );
+        });
       }
-      res.redirect("/attendance-details");
+      res.render("attendance-details", {
+        pageTitle: "Chi tiết công việc",
+        attendance: attendance,
+        totalWorkingHour: totalWorkingHour,
+      });
     })
     .catch((err) => console.log(err));
 };

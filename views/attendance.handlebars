@@ -2,7 +2,7 @@
   <div class="card bg-light">
     <div class="card-body text-left">
       {{#unless user.isWorking}}
-        <h6 class="card-text mb-3">Điểm danh bắt đầu</h6>
+        <h4 class="card-text mb-3">Điểm danh bắt đầu</h4>
         <form action="/attendance?type=start" method="POST">
           <div class="form-group">
             <label for="name">Họ và tên</label>
@@ -11,6 +11,26 @@
               class="form-control"
               name="name"
               value="{{user.name}}"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Ngày</label>
+            <input
+              type="text"
+              class="form-control"
+              name="date"
+              value="{{tolocaledatestring date}}"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Giờ</label>
+            <input
+              type="text"
+              class="form-control"
+              name="time"
+              value="{{getHours date}}:{{getMinutes date}}"
               disabled
             />
           </div>
@@ -25,8 +45,28 @@
           <button type="submit" class="btn btn-secondary">Check-in</button>
         </form>
       {{else}}
-        <h6 class="card-text mb-3">Kết thúc làm</h6>
+        <h4 class="card-text mb-3">Kết thúc làm</h4>
         <form action="/attendance?type=stop" method="POST">
+          <div class="form-group">
+            <label for="date">Ngày</label>
+            <input
+              type="text"
+              class="form-control"
+              name="date"
+              value="{{tolocaledatestring date}}"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Giờ</label>
+            <input
+              type="text"
+              class="form-control"
+              name="time"
+              value="{{getHours date}}:{{getMinutes date}}"
+              disabled
+            />
+          </div>
           <button type="submit" class="btn btn-secondary">Check-out</button>
         </form>
       {{/unless}}
@@ -34,7 +74,7 @@
   </div>
   <div class="card bg-light">
     <div class="card-body text-left">
-      <h6 class="card-text mb-3">Đăng ký nghỉ phép</h6>
+      <h4 class="card-text mb-3">Đăng ký nghỉ phép</h4>
       <a href="/absence">Link đăng ký</a>
     </div>
   </div>

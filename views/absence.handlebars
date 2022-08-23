@@ -1,158 +1,131 @@
 <div class="card-deck mt-3">
   <div class="card bg-light">
     {{#if user.annualLeave}}
-    <div class="card-body text-left">
-      <h6 class="card-text mb-3">Đăng ký nghỉ</h6>
-      <p><a href="/absence-details">Chi tiết</a></p>
-      <form action="/absence" method="POST">
-        <div class="form-group">
-          <label for="fromDate">Từ ngày</label>
-          <input
-            required
-            type="date"
-            class="form-control"
-            name="fromDate"
-          />
-        </div>
-        <div class="form-group">
-          <label for="toDate">Đến ngày</label>
-          <input
-            required
-            type="date"
-            class="form-control"
-            name="toDate"
-          />
-        </div>
-        <div class="form-group">
-          <label for="hours">Số giờ nghỉ</label>
-            <select name="hours" id="hours" class="form-control" required>
-              <option value="" disabled="disabled" selected="true">Lựa chọn</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-        </div>
-        <div class="form-group">
-          <label for="fromHour">Từ giờ</label>
-          <input
-            required
-            type="time"
-            class="form-control"
-            id="fromHour"
-            name="fromHour"
-            min="08:00"
-            max="17:00"
-          />
-        </div>
-        <div class="form-group">
-          <label for="toHour">Đến giờ</label>
-          <input
-            type="time"
-            class="form-control"
-            id="toHour"
-            name="toHour"
-            min="08:00"
-            max="17:00"
-          />
-        </div>
-        <div class="form-group">
-          <label for="reason">Lý do xin nghỉ</label>
-          <input
-            required
-            type="text"
-            class="form-control"
-            name="reason"
-            id="reason"
-          />
-        </div>
-        <button type="submit" class="btn btn-secondary">Register</button>
-      </form>
-      </form>
-      <p class="mt-3">Số ngày nghỉ còn lại: {{user.annualLeave}} ngày</p>
-    </div>
+      <div class="card-body text-left">
+        <h4 class="card-text mb-3">Đăng ký nghỉ</h4>
+        <p><a href="/absence-details">Chi tiết</a></p>
+        <form action="/absence" method="POST">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="fromDate">Từ ngày</label>
+              <input
+                required
+                type="date"
+                class="form-control"
+                name="fromDate"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="toDate">Đến ngày</label>
+              <input required type="date" class="form-control" name="toDate" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="fromHour">Từ mấy giờ</label>
+              <input
+                required
+                type="time"
+                class="form-control"
+                id="fromHour"
+                name="fromHour"
+                min="08:00"
+                max="17:00"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="toHour">Đến mấy giờ</label>
+              <input
+                type="time"
+                class="form-control"
+                id="toHour"
+                name="toHour"
+                min="08:00"
+                max="17:00"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="reason">Lý do xin nghỉ</label>
+              <input
+                required
+                type="text"
+                class="form-control"
+                name="reason"
+                id="reason"
+              />
+            </div>
+          </div>
+          <button type="submit" class="btn btn-secondary">Register</button>
+        </form>
+        <p class="mt-3">Số ngày nghỉ còn lại: {{user.annualLeave}} ngày</p>
+      </div>
     {{else}}
-   <div class="card-body text-left">
-      <h6 class="card-text mb-3">Bạn đã hết ngày nghỉ</h6>
-      <form action="/absence" method="POST">
-        <div class="form-group">
-          <label for="fromDate">Từ ngày</label>
-          <input
+      <div class="card-body text-left">
+        <h4 class="card-text mb-3">Bạn đã hết ngày nghỉ</h4>
+        <form action="/absence" method="POST">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="fromDate">Từ ngày</label>
+              <input
+                disabled
+                type="date"
+                class="form-control"
+                name="fromDate"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="toDate">Đến ngày</label>
+              <input disabled type="date" class="form-control" name="toDate" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="fromHour">Từ mấy giờ</label>
+              <input
+                disabled
+                type="time"
+                class="form-control"
+                id="fromHour"
+                name="fromHour"
+                min="08:00"
+                max="17:00"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="toHour">Đến mấy giờ</label>
+              <input
+                type="time"
+                class="form-control"
+                id="toHour"
+                name="toHour"
+                min="08:00"
+                max="17:00"
+                disabled
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="reason">Lý do xin nghỉ</label>
+              <input
+                disabled
+                type="text"
+                class="form-control"
+                name="reason"
+                id="reason"
+              />
+            </div>
+          </div>
+          <button
+            type="submit"
+            class="btn btn-secondary"
             disabled
-            type="date"
-            class="form-control"
-            name="fromDate"
-          />
-        </div>
-        <div class="form-group">
-          <label for="toDate">Đến ngày</label>
-          <input
-            disabled
-            type="date"
-            class="form-control"
-            name="toDate"
-          />
-        </div>
-        <div class="form-group">
-          <label for="hours">Số giờ nghỉ</label>
-            <select name="hours" class="form-control" disabled>
-              <option value="" disabled="disabled" selected="true">Lựa chọn</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-            </select>
-        </div>
-        <div class="form-group">
-          <label for="fromHour">Từ giờ</label>
-          <input
-            disabled
-            type="time"
-            class="form-control"
-            name="fromHour"
-            id="fromHour"
-          />
-        </div>
-        <div class="form-group">
-          <label for="toHour">Đến giờ</label>
-          <input
-            disabled
-            type="time"
-            class="form-control"
-            name="toHour"
-            id="toHour"
-          />
-        </div>
-        <div class="form-group">
-          <label for="reason">Lý do xin nghỉ</label>
-          <input
-            disabled
-            type="text"
-            class="form-control"
-            name="reason"
-          />
-        </div>
-        <button type="submit" class="btn btn-secondary" disabled>Register</button>
-      </form>
-      </form>
-      <p class="mt-3">Số ngày nghỉ còn lại: {{user.annualLeave}} ngày</p>
-    </div>
+          >Register</button>
+        </form>
+        <p class="mt-3">Số ngày nghỉ còn lại: {{user.annualLeave}} ngày</p>
+      </div>
     {{/if}}
   </div>
 </div>
-
-<script type="text/javascript">
-const hours = document.getElementById("hours");
-const fromHour = document.getElementById("fromHour");
-const toHour = document.getElementById("toHour");
-
-toHour.value = "12:00 am";
-</script>

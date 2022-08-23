@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const Status = require("../models/status");
 const Attendance = require("../models/attendance");
 
 // Get Home Page
@@ -12,30 +11,12 @@ exports.getHome = (req, res, next) => {
   });
 };
 
-// Check if user is logged in to add new status
+// Check if user is logged in to add new attendance
 exports.loggedIn = function (req, res, next) {
   User.findById("62f7766d4d90b2028b233de2")
     .lean()
     .then((user) => {
       req.user = user;
-      return Status.findOne({ userId: user._id });
-    })
-    .then((result) => {
-      if (!result) {
-        const status = new Status({
-          userId: req.user._id,
-          workplace: "Chưa xác định",
-          isWorking: false,
-          attendId: null,
-        });
-        return status.save();
-      } else {
-        return result;
-      }
-    })
-    .then((result) => {
-      req.user.workplace = result.workplace;
-      req.user.isWorking = result.isWorking;
       next();
     })
     .catch((err) => console.log(err));
@@ -47,7 +28,6 @@ exports.getEditUser = (req, res, next) => {
     .lean()
     .then((user) => {
       res.render("edit-user", {
-        css: "edit-user",
         pageTitle: user.name,
         user: user,
       });
@@ -68,102 +48,112 @@ exports.postEditUser = (req, res, next) => {
 };
 
 // Get all statistics of attendance
-exports.getStatistic = (req, res, next) => {
+exports.getWorkingHourStatistic = (req, res, next) => {
   const user = new User(req.user);
-  let salaryTotalHour = 0;
-  let salaryOvertime = 0;
-  let salaryScale = user.salaryScale;
-  let totalSalary = 0;
-  user.getStatistic().then((statistics) => {
-    // console.log(statistics);
-    statistics.forEach((item) => {
-      if (item.totalHour) {
-        salaryTotalHour += item.totalHour;
-      }
-      if (item.overTime) {
-        salaryOvertime += item.overTime;
-      }
-    });
-
-    res.render("statistic", {
-      pageTitle: "Tra cứu thông tin",
-      user: req.user,
-      statistics: statistics,
-      salaryTotalHour: salaryTotalHour,
-      salaryOvertime: salaryOvertime,
-      totalSalary: user.salaryScale * 3000000 + salaryOvertime * 200000,
-      type: "details",
-    });
-  });
+  user
+    .getStatistic()
+    .then((statistic) => {
+      res.render("workingHourStatistic", {
+        pageTitle: "Thông tin giờ làm",
+        user: req.user,
+        workingHourStatistic: statistic,
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
-// Get Statistic with Wildcard
-exports.getStatisticSearch = function (req, res, next) {
-  const { type, search } = req.query;
-  req.user
+exports.getSalaryStatistic = (req, res, next) => {
+  const user = new User(req.user);
+  const salaryStatistic = user.getWorkingMonths();
+  const salaryScale = user.salaryScale;
+  const searchMonth = new Date(req.query.searchMonth);
+  let currStatistic = [];
+  let totalSalary = 0;
+  let totalHourForSalary = 0;
+  let totalOvertimeForSalary = 0;
+  let totalMissingHourForSalary = 0;
+  let workingBusinessDay = 0;
+  user
     .getStatistic()
-    .lean()
-    .then((statistics) => {
-      var currStatistic = [],
-        attendStatistic = [],
-        absentStatistic = [];
-      if (type == "date") {
-        // Search by date
-        attendStatistic = statistics.filter(
-          (item) =>
-            Attendance.checkSearch(search, item.date.toString()) && item.attend
-        );
-        absentStatistic = statistics.filter(
-          (item) =>
-            Attendance.checkSearch(search, item.date.toString()) && !item.attend
-        );
-        if (attendStatistic.length > 0) {
-          // Check finished/not finished
-          attendStatistic.forEach((item) => {
-            if (!item.details[0].endTime) {
-              item.totalTime = "Chưa kết thúc";
-            } else {
-              item.totalTime = item.details.reduce(
-                (sum, detail) =>
-                  sum + (detail.endTime - detail.startTime) / 3600000,
-                0
-              );
-              item.overTime = item.totalTime > 8 ? item.totalTime - 8 : 0;
-              item.underTime = item.totalTime < 8 ? 8 - item.totalTime : 0;
+    .then((statistic) => {
+      salaryStatistic.forEach((object) => {
+        statistic.forEach((item) => {
+          const year = item.date.getUTCFullYear();
+          const month = item.date.getUTCMonth() + 1;
+          const day = item.date.getUTCDay();
+          const mmYYYY = `${month}/${year}`;
+          if (mmYYYY === object.month) {
+            workingBusinessDay = user.getWorkingBussinessDay(year, month - 1);
+            if (item.totalHour) totalHourForSalary += item.totalHour;
+            if (item.overTime) totalOvertimeForSalary += item.overTime;
+            if (day >= 1 && day <= 5 && !item.totalHour) {
+              totalMissingHourForSalary += 8;
             }
-          });
-          const totalTime = attendStatistic.reduce(
-            (sum, item) => sum + item.totalTime,
-            0
-          );
-          const overTime = attendStatistic.reduce(
-            (sum, item) => sum + item.overTime,
-            0
-          );
-          const underTime = attendStatistic.reduce(
-            (sum, item) => sum + item.underTime,
-            0
-          );
-
-          currStatistic = [...attendStatistic, ...absentStatistic];
-          currStatistic.overTime = overTime;
-          currStatistic.underTime = underTime;
-          if (typeof totalTime === "string") {
-            currStatistic.salary = "Chưa kết thúc";
-          } else {
-            currStatistic.salary = (
-              req.user.salaryScale * 3000000 +
-              (overTime - underTime) * 200000
-            ).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+            if (
+              day >= 1 &&
+              day <= 5 &&
+              item.totalHour > 0 &&
+              item.totalHour < 8
+            ) {
+              const missingHour = 8 - item.totalHour;
+              totalMissingHourForSalary += missingHour;
+            }
+            if (totalHourForSalary === workingBusinessDay * 8) {
+              totalSalary = salaryScale * 3e6;
+            } else if (totalHourForSalary < workingBusinessDay * 8) {
+              totalSalary =
+                ((salaryScale * 3e6) / (workingBusinessDay * 8)) *
+                totalHourForSalary;
+            } else if (totalHourForSalary > workingBusinessDay * 8) {
+              totalSalary =
+                salaryScale * 3e6 + (totalOvertimeForSalary / 8) * 2e5;
+            }
           }
-        }
-      }
-      res.render("statistic", {
-        css: "statistic",
-        pageTitle: "Tra cứu thông tin",
+          Object.assign(object, {
+            totalHour: totalHourForSalary,
+            overTime: totalOvertimeForSalary,
+            missingHour: totalMissingHourForSalary,
+            missingDay: (totalMissingHourForSalary / 8).toFixed(1),
+            totalSalary: totalSalary.toFixed(0),
+            workingBussinessDay: workingBusinessDay,
+          });
+        });
+        totalHourForSalary = 0;
+        totalOvertimeForSalary = 0;
+        totalMissingHourForSalary = 0;
+        totalSalary = 0;
+        workingBusinessDay = 0;
+      });
+      return salaryStatistic;
+    })
+    .then((salaryStatistic) => {
+      res.render("salaryStatistic", {
+        pageTitle: "Thông tin bảng lương",
         user: req.user,
-        statistics: currStatistic,
-        type: "salary",
+        salaryStatistic: salaryStatistic,
+      });
+    })
+    .catch((err) => console.log(err));
+};
+
+// Get Working Hour Statistic with Wildcard
+exports.getWorkingHourStatisticSearch = function (req, res, next) {
+  const user = new User(req.user);
+  const searchFromDate = new Date(req.query.searchFromDate);
+  const searchToDate = new Date(req.query.searchToDate);
+  let currStatistic = [];
+  user
+    .getStatistic()
+    .then((statistic) => {
+      statistic.forEach((x) => {
+        if (x.date <= searchToDate && x.date >= searchFromDate) {
+          currStatistic.push(x);
+        }
+      });
+      res.render("workingHourStatistic", {
+        pageTitle: "Tra cứu thông tin giờ làm",
+        user: req.user,
+        workingHourStatistic: currStatistic,
       });
     })
     .catch((err) => {
@@ -171,14 +161,91 @@ exports.getStatisticSearch = function (req, res, next) {
     });
 };
 
-exports.postStatisticSalary = (req, res, next) => {
-  const { date } = req.body;
-  req.user.getStatistic(type, date).then((statistics) => {
-    res.render("statistic", {
-      css: "statistic",
-      pageTitle: "Tra cứu thông tin",
-      user: req.user,
-      statistics: statistics,
-    });
-  });
+// Get Salary Statistic with Wildcard
+exports.getSalaryStatisticSearch = function (req, res, next) {
+  const user = new User(req.user);
+  const salaryStatistic = user.getWorkingMonths();
+  const salaryScale = user.salaryScale;
+  const searchMonth = new Date(req.query.searchMonth);
+  let currStatistic = [];
+  let totalSalary = 0;
+  let totalHourForSalary = 0;
+  let totalOvertimeForSalary = 0;
+  let totalMissingHourForSalary = 0;
+  let workingBusinessDay = 0;
+  user
+    .getStatistic()
+    .then((statistic) => {
+      salaryStatistic.forEach((object) => {
+        statistic.forEach((item) => {
+          const year = item.date.getUTCFullYear();
+          const month = item.date.getUTCMonth() + 1;
+          const day = item.date.getUTCDay();
+          const mmYYYY = `${month}/${year}`;
+          if (mmYYYY === object.month) {
+            workingBusinessDay = user.getWorkingBussinessDay(year, month - 1);
+            if (item.totalHour) totalHourForSalary += item.totalHour;
+            if (item.overTime) totalOvertimeForSalary += item.overTime;
+            if (day >= 1 && day <= 5 && !item.totalHour) {
+              totalMissingHourForSalary += 8;
+            }
+            if (
+              day >= 1 &&
+              day <= 5 &&
+              item.totalHour > 0 &&
+              item.totalHour < 8
+            ) {
+              const missingHour = 8 - item.totalHour;
+              totalMissingHourForSalary += missingHour;
+            }
+            if (totalHourForSalary === workingBusinessDay * 8) {
+              totalSalary = salaryScale * 3e6;
+            } else if (totalHourForSalary < workingBusinessDay * 8) {
+              totalSalary =
+                ((salaryScale * 3e6) / (workingBusinessDay * 8)) *
+                totalHourForSalary;
+            } else if (totalHourForSalary > workingBusinessDay * 8) {
+              totalSalary =
+                salaryScale * 3e6 + (totalOvertimeForSalary / 8) * 2e5;
+            }
+          }
+          Object.assign(object, {
+            totalHour: totalHourForSalary,
+            overTime: totalOvertimeForSalary,
+            missingHour: totalMissingHourForSalary,
+            missingDay: (totalMissingHourForSalary / 8).toFixed(1),
+            totalSalary: totalSalary.toFixed(0),
+            workingBussinessDay: workingBusinessDay,
+          });
+        });
+        totalHourForSalary = 0;
+        totalOvertimeForSalary = 0;
+        totalMissingHourForSalary = 0;
+        totalSalary = 0;
+        workingBusinessDay = 0;
+      });
+      return salaryStatistic;
+    })
+    .then((salaryStatistic) => {
+      const mmYYYY = `${
+        searchMonth.getUTCMonth() + 1
+      }/${searchMonth.getUTCFullYear()}`;
+      salaryStatistic.forEach((item) => {
+        if (item.month === mmYYYY) {
+          currStatistic.push(item);
+        }
+      });
+      return currStatistic;
+    })
+    .then(() => {
+      res.render("salaryStatistic", {
+        pageTitle: "Thông tin bảng lương",
+        user: req.user,
+        salaryStatistic: currStatistic,
+        searchMonth: `${
+          searchMonth.getUTCMonth() + 1
+        }/${searchMonth.getUTCFullYear()}`,
+      });
+    })
+    .catch((err) => console.log(err));
 };

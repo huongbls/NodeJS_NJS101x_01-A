@@ -1,47 +1,82 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Create Model
 const attendanceSchema = new Schema({
-    userId: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  date: {
+    type: String,
+    required: true,
+  },
+  details: [
+    {
+      startTime: { type: Date },
+      endTime: { type: Date },
+      workplace: { type: String, required: true },
     },
-    date: {
-        type: String,
-        required: true
-    },
-    details: [
-        {
-            startTime: {type: Date},
-            endTime: {type: Date},
-            workplace: {type: String, required: true}
-        }
-    ]
+  ],
 });
 
-// Check wildcard search
-attendanceSchema.statics.checkSearch = function (first, second){
-    if (first.length == 0 && second.length == 0)
-        return true;
+// Tạo statics thiết lập mảng các tháng đã làm từ ngày vào công ty đến hiện tại
+attendanceSchema.statics.attendanceMonthRange = function (
+  startDate,
+  endDate,
+  steps = 10
+) {
+  const monthArray = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= new Date(endDate)) {
+    const mmYyyy = `${new Date(currentDate).getUTCMonth() + 1}/${new Date(
+      currentDate
+    ).getUTCFullYear()}`;
+    if (!monthArray.filter((x) => x === mmYyyy).length) {
+      monthArray.push(mmYyyy);
+    }
+    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
+  }
+  return monthArray;
+};
 
-    if (first.length > 1 && first[0] == '*' &&
-        second.length == 0)
-        return false;
+//Tạo statics liệt kê các ngày từ ngày bắt đầu vào công ty đến hiện tại ngoại trừ thứ 7, chủ nhật
+attendanceSchema.statics.attendanceWorkingRange = function (
+  startDate,
+  endDate,
+  steps = 1
+) {
+  const dateArray = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= new Date(endDate)) {
+    if (currentDate.getUTCDay() >= 1 && currentDate.getUTCDay() <= 5) {
+      dateArray.push(new Date(currentDate));
+    }
+    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
+  }
+  return dateArray;
+};
 
-    if ((first.length > 1 && first[0] == '?') ||
-        (first.length != 0 && second.length != 0 &&
-        first[0] == second[0]))
-        return this.checkSearch(first.substring(1),
-                    second.substring(1));
+//Tạo statics liệt kê các ngày từ ngày bắt đầu vào công ty đến hiện tại có bao gồm cả thứ 7, chủ nhật
+attendanceSchema.statics.workingRange = function (startDate, today, steps = 1) {
+  const workingArray = [];
+  let currentDate = new Date(startDate);
+  while (currentDate <= new Date(today)) {
+    workingArray.push(new Date(currentDate));
+    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
+  }
+  return workingArray;
+};
 
-    if (first.length > 0 && first[0] == '*')
-        return this.checkSearch(first.substring(1), second) ||
-            this.checkSearch(first, second.substring(1));
+// Tạo statics tính tổng giờ làm của một ngày
+attendanceSchema.statics.calcTotalWorkingHour = function (startTime, endTime) {
+  let totalWorkingHour = 0;
+  if (endTime && startTime) {
+    const sessionWorkingHour = ((endTime - startTime) / 3.6e6).toFixed(1);
+    totalWorkingHour += parseFloat(sessionWorkingHour);
+  }
+  return totalWorkingHour;
+};
 
-    return false;
-}
-
-module.exports = mongoose.model('Attendance',attendanceSchema);
-
+module.exports = mongoose.model("Attendance", attendanceSchema);

@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Attendance = require("./attendance");
 const Absence = require("./absence");
-const Status = require("./status");
 
 const Schema = mongoose.Schema;
 
@@ -14,135 +13,17 @@ const userSchema = new Schema({
   department: { type: String, required: true },
   annualLeave: { type: Number, required: true },
   image: { type: String, required: true },
+  isWorking: { type: Boolean, default: false },
+  workplace: { type: String },
 });
 
-//Get - Change Working Status
-userSchema.methods.getStatus = function (type, workplace) {
-  const user = this;
-  let currAttendId = null;
-  return Status.findOne({ userId: user._id })
-    .then((status) => {
-      currAttendId = status.attendId;
-      if (type === "start") {
-        return this.addAttendance(
-          currAttendId,
-          new Date().toLocaleDateString(),
-          new Date(),
-          workplace
-        )
-          .then((result) => {
-            currAttendId = result._id;
-            return Status.findOne({ userId: user._id });
-          })
-          .then((status) => {
-            status.attendId = currAttendId;
-            status.workplace = workplace;
-            status.isWorking = true;
-            return status.save();
-          })
-          .catch((err) => console.log(err));
-      } else {
-        return this.finishAttendance(currAttendId, new Date())
-          .then((result) => {
-            return Status.findOne({ userId: user._id });
-          })
-          .then((status) => {
-            status.isWorking = false;
-            status.workplace = "Chưa xác định";
-            return status.save();
-          })
-          .catch((err) => console.log(err));
-      }
-    })
-    .catch((err) => console.log(err));
-};
-
-// Stop Working
-userSchema.methods.finishAttendance = function (attendId, endTime) {
-  return Attendance.findById(attendId).then((attendance) => {
-    attendance.details[0].endTime = endTime;
-    return attendance.save();
-  });
-};
-
-// Start Working
-userSchema.methods.addAttendance = function (
-  attendId,
-  date,
-  startTime,
-  workplace
-) {
-  if (attendId) {
-    return Attendance.findById(attendId).then((attendance) => {
-      // Check if the attendance is not finished
-      if (date === attendance.date) {
-        attendance.details.unshift({
-          startTime: startTime,
-          endTime: null,
-          workplace: workplace,
-        });
-        return attendance.save();
-      } else {
-        const newAttend = new Attendance({
-          userId: this._id,
-          date: date,
-          details: [
-            {
-              startTime: startTime,
-              endTime: null,
-              workplace: workplace,
-            },
-          ],
-        });
-        return newAttend.save();
-      }
-    });
-  } else {
-    const newAttend = new Attendance({
-      userId: this._id,
-      date: date,
-      details: [
-        {
-          startTime: startTime,
-          endTime: null,
-          workplace: workplace,
-        },
-      ],
-    });
-    return newAttend.save();
-  }
-};
-
-// Get Attendance Detail Per Day
-userSchema.methods.getAttendanceDetails = function () {
-  return Status.findOne({ userId: this._id }).then((status) => {
-    return Attendance.findById(status.attendId)
-      .then((attendance) => {
-        return attendance;
-      })
-      .catch((err) => console.log(err));
-  });
-};
-
-const dateRange = function (startDate, endDate, steps = 1) {
-  const dateArray = [];
-  let currentDate = new Date(startDate);
-  while (currentDate <= new Date(endDate)) {
-    dateArray.push(new Date(currentDate));
-    // Use UTC date to prevent problems with time zones and DST
-    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
-  }
-  return dateArray;
-};
-
-// Get All Attendance Statistic
+// Get All attendance and absence Statistic
 userSchema.methods.getStatistic = function () {
   let statistics = [];
-  const dateArr = dateRange(this.startDate, new Date(), 1);
+  const dateArr = Attendance.workingRange(this.startDate, new Date(), 1);
   dateArr.forEach((date) => {
     statistics.push({ date: date });
   });
-  // Get all attendance and absence
   return Absence.find({ userId: this._id })
     .lean()
     .then((absences) => {
@@ -153,11 +34,9 @@ userSchema.methods.getStatistic = function () {
               object.date.toLocaleDateString() ===
               leave.fromDate.toLocaleDateString()
             ) {
-              let leaveHour = 0;
-              const leaveFromHour = new Date(`1900-01-01 ${leave.fromHour}`);
-              const leaveToHour = new Date(`1900-01-01 ${leave.toHour}`);
-              leaveHour = parseFloat(
-                ((leaveToHour - leaveFromHour) / 3.6e6).toFixed(1)
+              const leaveHour = Absence.absenceCountHour(
+                leave.fromHour,
+                leave.toHour
               );
               Object.assign(
                 object,
@@ -177,21 +56,14 @@ userSchema.methods.getStatistic = function () {
             let totalWorkingHour = 0;
             if (attendance) {
               attendance.details.forEach((item) => {
-                // Tính tổng giờ làm của một ngày
-                if (item.endTime && item.startTime) {
-                  const sessionWorkingHour = (
-                    (item.endTime - item.startTime) /
-                    3.6e6
-                  ).toFixed(1);
-                  totalWorkingHour += parseFloat(sessionWorkingHour);
-                }
+                totalWorkingHour += Attendance.calcTotalWorkingHour(
+                  item.startTime,
+                  item.endTime
+                );
               });
             }
             statistics.forEach((object) => {
-              if (
-                attendance.details.length > 0 &&
-                object.date.toLocaleDateString() === attendance.date
-              ) {
+              if (object.date.toLocaleDateString() === attendance.date) {
                 const leaveHour = object.leaveHour;
                 Object.assign(
                   object,
@@ -204,14 +76,16 @@ userSchema.methods.getStatistic = function () {
                   },
                   {
                     overTime: leaveHour
-                      ? Math.max(totalWorkingHour + leaveHour - 8, 0)
-                      : Math.max(totalWorkingHour - 8, 0),
+                      ? Math.max(
+                          (totalWorkingHour + leaveHour - 8).toFixed(1),
+                          0
+                        )
+                      : Math.max((totalWorkingHour - 8).toFixed(1), 0),
                   }
                 );
               }
             });
           });
-
           statistics.sort((a, b) => {
             return new Date(a.date) - new Date(b.date);
           });
@@ -219,6 +93,28 @@ userSchema.methods.getStatistic = function () {
         });
     })
     .catch((err) => console.log(err));
+};
+
+userSchema.methods.getWorkingBussinessDay = function (year, month) {
+  return new Array(32 - new Date(year, month, 32).getDate())
+    .fill(1)
+    .filter(
+      (id, index) =>
+        [0, 6].indexOf(new Date(year, month, index + 1).getDay()) === -1
+    ).length;
+};
+
+userSchema.methods.getWorkingMonths = function () {
+  let salaryStatistics = [];
+  const monthArr = Attendance.attendanceMonthRange(
+    this.startDate,
+    new Date(),
+    10
+  );
+  monthArr.forEach((month) => {
+    salaryStatistics.push({ month: month });
+  });
+  return salaryStatistics;
 };
 
 module.exports = mongoose.model("User", userSchema);
