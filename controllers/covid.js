@@ -19,7 +19,6 @@ exports.getCovid = (req, res, next) => {
     })
     .then((covid) => {
       res.render("covid", {
-        path: "/covid",
         pageTitle: "Thông tin Covid",
         user: req.user,
         vaccine: covid.vaccine,
@@ -75,7 +74,6 @@ exports.getCovidDetails = (req, res, next) => {
     })
     .then((covid) => {
       res.render(`covid-details`, {
-        path: "/covid-details",
         pageTitle: "Thông tin Covid",
         user: req.user,
         covid: covid,

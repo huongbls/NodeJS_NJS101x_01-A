@@ -33,8 +33,6 @@ exports.getAttendace = (req, res, next) => {
 // Post Attendance: Start - Stop
 exports.postAttendance = (req, res, next) => {
   const type = req.query.type;
-  const workplace = req.body.workplace;
-  const user = new User(req.user);
   if (type === "start") {
     Attendance.findOne({
       userId: req.user._id,
@@ -48,7 +46,7 @@ exports.postAttendance = (req, res, next) => {
         });
         return attendance.save();
       })
-      .then((status) => {
+      .then((result) => {
         res.redirect("/");
       })
       .catch((err) => console.log(err));
@@ -66,7 +64,7 @@ exports.postAttendance = (req, res, next) => {
         attendance.details[0].endTime = new Date();
         return attendance.save();
       })
-      .then((status) => {
+      .then((result) => {
         res.redirect("/attendance-details");
       })
       .catch((err) => console.log(err));
@@ -95,6 +93,7 @@ exports.getAttendanceDetails = (req, res, next) => {
       }
       res.render("attendance-details", {
         pageTitle: "Chi tiết công việc",
+        user: req.user,
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
         active: { timesheet: true },

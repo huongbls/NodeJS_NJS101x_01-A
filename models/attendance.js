@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-// Create Model
 const attendanceSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -41,28 +40,11 @@ attendanceSchema.statics.attendanceMonthRange = function (
   return monthArray;
 };
 
-//Tạo statics liệt kê các ngày từ ngày bắt đầu vào công ty đến hiện tại ngoại trừ thứ 7, chủ nhật
-attendanceSchema.statics.attendanceWorkingRange = function (
-  startDate,
-  endDate,
-  steps = 1
-) {
-  const dateArray = [];
-  let currentDate = new Date(startDate);
-  while (currentDate <= new Date(endDate)) {
-    if (currentDate.getUTCDay() >= 1 && currentDate.getUTCDay() <= 5) {
-      dateArray.push(new Date(currentDate));
-    }
-    currentDate.setUTCDate(currentDate.getUTCDate() + steps);
-  }
-  return dateArray;
-};
-
-//Tạo statics liệt kê các ngày từ ngày bắt đầu vào công ty đến hiện tại có bao gồm cả thứ 7, chủ nhật
-attendanceSchema.statics.workingRange = function (startDate, today, steps = 1) {
+//Tạo statics thiết lập mảng các ngày từ fromDate đến toDdate có bao gồm cả thứ 7, chủ nhật
+attendanceSchema.statics.workingRange = function (fromDate, toDate, steps = 1) {
   const workingArray = [];
-  let currentDate = new Date(startDate);
-  while (currentDate <= new Date(today)) {
+  let currentDate = new Date(fromDate);
+  while (currentDate <= new Date(toDate)) {
     workingArray.push(new Date(currentDate));
     currentDate.setUTCDate(currentDate.getUTCDate() + steps);
   }

@@ -35,21 +35,19 @@
         {{/each}}
       </tbody>
     </table>
-    {{#if searchMonth}}
-      <p class="mt-3">
-        <a href="/salaryStatistic">Quay lại Thông tin bảng lương</a>
-      </p>
-    {{/if}}
   {{else}}
     {{#ifCond searchMonth "!==" "NaN/NaN"}}
       <p class="mt-5">Không có thông tin bảng lương tháng
-        {{searchMonth}}. Hãy chọn lại hoặc
-        <a href="/salaryStatistic">quay lại Thông tin bảng lương</a>
+        {{searchMonth}}.
       </p>
     {{else}}
-      <p class="mt-5">Bạn chưa chọn tháng để tra cứu. Hãy chọn lại hoặc
-        <a href="/salaryStatistic">Quay lại Thông tin bảng lương</a>
+      <p class="mt-5">Bạn chưa chọn tháng để tra cứu.
       </p>
     {{/ifCond}}
+  {{/if}}
+  {{#if searchMonth}}
+    <p class="mt-3">
+      <a href="/salaryStatistic">Quay lại Thông tin bảng lương</a>
+    </p>
   {{/if}}
 </div>

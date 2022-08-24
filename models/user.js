@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const Attendance = require("./attendance");
 const Absence = require("./absence");
-
 const Schema = mongoose.Schema;
 
 // Create Schema
@@ -17,10 +16,18 @@ const userSchema = new Schema({
   workplace: { type: String },
 });
 
-// Get All attendance and absence Statistic
+// Method tạo mảng statistics chứa các object bao gồm các ngày từ ngày vào công ty,
+// đến ngày cuối cùng của năm hiện tại. Nếu có các thông tin giờ làm việc, nghỉ phép tương ứng các ngày
+//thì sẽ được thêm vào object.
 userSchema.methods.getStatistic = function () {
   let statistics = [];
-  const dateArr = Attendance.workingRange(this.startDate, new Date(), 1);
+  const today = new Date();
+  const firstDayOfNextMonth = new Date(today.getFullYear(), 12, 0);
+  const dateArr = Attendance.workingRange(
+    this.startDate,
+    firstDayOfNextMonth,
+    1
+  );
   dateArr.forEach((date) => {
     statistics.push({ date: date });
   });
@@ -95,6 +102,7 @@ userSchema.methods.getStatistic = function () {
     .catch((err) => console.log(err));
 };
 
+// Tạo method tính số ngày làm việc của tháng (không bao gồm thứ 7, chủ nhật)
 userSchema.methods.getWorkingBussinessDay = function (year, month) {
   return new Array(32 - new Date(year, month, 32).getDate())
     .fill(1)
@@ -104,6 +112,7 @@ userSchema.methods.getWorkingBussinessDay = function (year, month) {
     ).length;
 };
 
+//Methods tạo mảng chứa các tháng đã làm việc
 userSchema.methods.getWorkingMonths = function () {
   let salaryStatistics = [];
   const monthArr = Attendance.attendanceMonthRange(

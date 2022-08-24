@@ -1,5 +1,4 @@
 const User = require("../models/user");
-const Attendance = require("../models/attendance");
 
 // Check if user is logged in to add new attendance
 exports.loggedIn = function (req, res, next) {
@@ -20,6 +19,15 @@ exports.getHome = (req, res, next) => {
     user: user,
     pageTitle: "Trang chủ",
     active: { home: true },
+  });
+};
+
+// Get About Page
+exports.getAbout = (req, res, next) => {
+  res.render("about", {
+    pageTitle: "Giới thiệu",
+    user: req.user,
+    active: { about: true },
   });
 };
 
@@ -70,8 +78,6 @@ exports.getSalaryStatistic = (req, res, next) => {
   const user = new User(req.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
-  const searchMonth = new Date(req.query.searchMonth);
-  let currStatistic = [];
   let totalSalary = 0;
   let totalHourForSalary = 0;
   let totalOvertimeForSalary = 0;
@@ -159,6 +165,10 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
         pageTitle: "Tra cứu thông tin giờ làm",
         user: req.user,
         workingHourStatistic: currStatistic,
+        searchFromDate: searchFromDate,
+        searchToDate: searchToDate,
+        isNaNSearchFromDate: isNaN(searchFromDate),
+        isNaNSearchToDate: isNaN(searchToDate),
         active: { record: true },
       });
     })
@@ -255,11 +265,4 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
       });
     })
     .catch((err) => console.log(err));
-};
-
-exports.getAbout = (req, res, next) => {
-  res.render("about", {
-    pageTitle: "Giới thiệu",
-    active: { about: true },
-  });
 };

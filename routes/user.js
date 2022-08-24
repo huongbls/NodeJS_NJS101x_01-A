@@ -23,7 +23,6 @@ router.get(
   userController.getWorkingHourStatisticSearch
 );
 router.get("/salaryStatistic-search", userController.getSalaryStatisticSearch);
-// router.post("/statistic", userController.postStatisticSalary);
 
 // Attendance Page
 router.get("/attendance", attendanceController.getAttendace);

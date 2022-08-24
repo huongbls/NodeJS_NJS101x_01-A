@@ -7,10 +7,6 @@ const absenceSchema = new Schema({
     ref: "User",
     required: true,
   },
-  date: {
-    type: Date,
-    required: true,
-  },
   registerLeave: [
     {
       fromDate: {

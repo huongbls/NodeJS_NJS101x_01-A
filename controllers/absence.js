@@ -9,7 +9,6 @@ exports.getAbsence = (req, res, next) => {
       if (!result) {
         const newAbsence = new Absence({
           userId: req.user._id,
-          date: new Date(),
           registerLeave: [],
         });
         return newAbsence.save();
