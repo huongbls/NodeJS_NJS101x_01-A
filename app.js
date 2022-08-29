@@ -2,20 +2,25 @@
 const express = require("express");
 const exphbs = require("express-handlebars");
 const path = require("path");
+const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const dbConnect = require("./ultil/database").mongooseConnect;
 const userRoutes = require("./routes/user");
 const User = require("./models/user");
+const session = require("express-session");
+const MongoDBStore = require("connect-mongodb-session")(session);
 
 // Import Controllers
 const errorControllers = require("./controllers/error404");
 const userController = require("./controllers/user");
 
 const app = express();
+const store = new MongoDBStore({
+  uri: "mongodb+srv://huong:OiFcLLuMsc9aIYBh@asm1.7szamyk.mongodb.net/test",
+  collection: "sessions",
+});
 
 // Define Template Engine
-// app.set("view engine", "ejs");
-// app.set("views", "views");
 app.engine(
   "handlebars",
   exphbs({
@@ -77,11 +82,22 @@ app.engine(
 app.set("view engine", "handlebars");
 
 // Check User is Logged In
-app.use(userController.loggedIn);
+// app.use(userController.loggedIn);
+// app.use(userController.postLogin);
+
+// app.use(morgan("combined"));
 
 // Define Static Folder
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(
+  session({
+    secret: "my secret",
+    resave: false,
+    saveUninitialized: false,
+    store: store,
+  })
+);
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -98,6 +114,8 @@ dbConnect()
         if (!user) {
           const user = new User({
             name: "Nguyễn Văn A",
+            email: "admin@gmail.com",
+            password: "123456",
             dob: new Date("2000-01-01"),
             salaryScale: 1.0,
             startDate: new Date("2022-05-31"),

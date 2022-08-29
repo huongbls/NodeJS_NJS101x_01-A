@@ -3,12 +3,12 @@ const User = require("../models/user");
 
 // GET Absence Page
 exports.getAbsence = (req, res, next) => {
-  Absence.findOne({ userId: req.user._id })
+  Absence.findOne({ userId: req.session.user._id })
     .lean()
     .then((result) => {
       if (!result) {
         const newAbsence = new Absence({
-          userId: req.user._id,
+          userId: req.session.user._id,
           registerLeave: [],
         });
         return newAbsence.save();
@@ -18,9 +18,10 @@ exports.getAbsence = (req, res, next) => {
     .then((absence) => {
       res.render("absence", {
         pageTitle: "Đăng ký nghỉ",
-        user: req.user,
+        user: req.session.user,
         absence: absence,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -39,10 +40,10 @@ exports.postAbsence = (req, res, next) => {
   );
   // Tính số ngày đăng ký nghỉ = só ngày (ko bao gồm thứ 7, cn)* số giờ /8
   const dayLeaveRequest = ((absenceDateArr.length * countHours) / 8).toFixed(1);
-  const annualLeave = req.user.annualLeave;
+  const annualLeave = req.session.user.annualLeave;
   const daysRemain = annualLeave - dayLeaveRequest;
 
-  Absence.findOne({ userId: req.user._id })
+  Absence.findOne({ userId: req.session.user._id })
     .then((absence) => {
       absenceDateArr.forEach((date) => {
         absence.registerLeave.push({
@@ -70,7 +71,9 @@ exports.postAbsence = (req, res, next) => {
 
 // Get Absence Details Page
 exports.getAbsenceDetails = (req, res, next) => {
-  Absence.findOne({ userId: req.user._id })
+  console.log(req.session.user._id);
+  console.log(req.session.user);
+  Absence.findOne({ userId: req.session.user._id })
     .lean()
     .then((absence) => {
       return absence;
@@ -78,9 +81,10 @@ exports.getAbsenceDetails = (req, res, next) => {
     .then((absence) => {
       res.render("absence-details", {
         pageTitle: "Nghỉ phép",
-        user: req.user,
+        user: req.session.user,
         absence: absence,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

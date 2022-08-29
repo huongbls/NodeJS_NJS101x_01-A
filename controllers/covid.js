@@ -2,13 +2,13 @@ const Covid = require("../models/covid");
 
 // Get Covid Page
 exports.getCovid = (req, res, next) => {
-  Covid.findOne({ userId: req.user._id })
+  Covid.findOne({ userId: req.session.user._id })
     .lean()
     .then((covid) => {
       // Check if user has no covid data
       if (!covid) {
         const newCovid = new Covid({
-          userId: req.user._id,
+          userId: req.session.user._id,
           bodyTemperatures: [],
           vaccine: [],
           positive: [],
@@ -20,9 +20,10 @@ exports.getCovid = (req, res, next) => {
     .then((covid) => {
       res.render("covid", {
         pageTitle: "Thông tin Covid",
-        user: req.user,
+        user: req.session.user,
         vaccine: covid.vaccine,
         active: { covid: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -31,7 +32,8 @@ exports.getCovid = (req, res, next) => {
 // Post Covid Details Page
 exports.postCovid = (req, res, next) => {
   const type = req.query.type;
-  Covid.findOne({ userId: req.user._id })
+  console.log(req.body.temperature);
+  Covid.findOne({ userId: req.session.user._id })
     .then((covid) => {
       // Check type of covid-form (temperature, vaccine, positive)
       if (type === "temperature") {
@@ -56,7 +58,7 @@ exports.postCovid = (req, res, next) => {
 // Get Covid Details Page
 exports.getCovidDetails = (req, res, next) => {
   // Get Covid Details by User
-  Covid.findOne({ userId: req.user._id })
+  Covid.findOne({ userId: req.session.user._id })
     .lean()
     .then((covid) => {
       // Check if user has no covid data
@@ -64,7 +66,7 @@ exports.getCovidDetails = (req, res, next) => {
         return covid;
       } else {
         const newCovid = new Covid({
-          userId: req.user._id,
+          userId: req.session.user._id,
           bodyTemperatures: [],
           vaccine: [],
           positive: [],
@@ -75,9 +77,10 @@ exports.getCovidDetails = (req, res, next) => {
     .then((covid) => {
       res.render(`covid-details`, {
         pageTitle: "Thông tin Covid",
-        user: req.user,
+        user: req.session.user,
         covid: covid,
         active: { covid: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

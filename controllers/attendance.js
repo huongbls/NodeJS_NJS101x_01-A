@@ -4,14 +4,14 @@ const User = require("../models/user");
 // Get Start Working Page
 exports.getAttendace = (req, res, next) => {
   Attendance.findOne({
-    userId: req.user._id,
+    userId: req.session.user._id,
     date: new Date().toLocaleDateString(),
   })
     .lean()
     .then((result) => {
       if (!result) {
         const newAttendance = new Attendance({
-          userId: req.user._id,
+          userId: req.session.user._id,
           date: new Date().toLocaleDateString(),
           details: [],
         });
@@ -22,9 +22,10 @@ exports.getAttendace = (req, res, next) => {
     .then((attendance) => {
       res.render("attendance", {
         pageTitle: "Điểm danh",
-        user: req.user,
+        user: req.session.user,
         date: new Date(),
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -35,7 +36,7 @@ exports.postAttendance = (req, res, next) => {
   const type = req.query.type;
   if (type === "start") {
     Attendance.findOne({
-      userId: req.user._id,
+      userId: req.session.user._id,
       date: new Date().toLocaleDateString(),
     })
       .then((attendance) => {
@@ -51,13 +52,13 @@ exports.postAttendance = (req, res, next) => {
       })
       .catch((err) => console.log(err));
 
-    User.findByIdAndUpdate(req.user._id, {
+    User.findByIdAndUpdate(req.session.user._id, {
       isWorking: true,
       workplace: req.body.workplace,
     }).catch((err) => console.log(err));
   } else if (type === "stop") {
     Attendance.findOne({
-      userId: req.user._id,
+      userId: req.session.user._id,
       date: new Date().toLocaleDateString(),
     })
       .then((attendance) => {
@@ -69,7 +70,7 @@ exports.postAttendance = (req, res, next) => {
       })
       .catch((err) => console.log(err));
 
-    User.findByIdAndUpdate(req.user._id, {
+    User.findByIdAndUpdate(req.session.user._id, {
       isWorking: false,
       workplace: "Chưa xác định",
     }).catch((err) => console.log(err));
@@ -79,7 +80,7 @@ exports.postAttendance = (req, res, next) => {
 // Get Attendance Details Page
 exports.getAttendanceDetails = (req, res, next) => {
   const today = new Date().toLocaleDateString();
-  Attendance.findOne({ userId: req.user._id, date: today })
+  Attendance.findOne({ userId: req.session.user._id, date: today })
     .lean()
     .then((attendance) => {
       let totalWorkingHour = 0;
@@ -93,10 +94,11 @@ exports.getAttendanceDetails = (req, res, next) => {
       }
       res.render("attendance-details", {
         pageTitle: "Chi tiết công việc",
-        user: req.user,
+        user: req.session.user,
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

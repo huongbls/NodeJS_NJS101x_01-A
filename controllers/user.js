@@ -1,33 +1,164 @@
 const User = require("../models/user");
+// const crypto = require("crypto");
+
+const bcrypt = require("bcryptjs");
+// const nodemailer = require("nodemailer");
+// const sendgridTransport = require("nodemailer-sendgrid-transport");
+const { validationResult } = require("express-validator/check");
 
 // Check if user is logged in to add new attendance
-exports.loggedIn = function (req, res, next) {
-  User.findById("62f7766d4d90b2028b233de2")
-    .lean()
+// exports.loggedIn = function (req, res, next) {
+//   console.log(this.email);
+//   User.findOne({ email: "admin@gmail.com", password: "123456" })
+//     // User.findById("6309bd4fea30ed1222ecfa91")
+//     .lean()
+//     .then((user) => {
+//       req.user = user;
+//       next();
+//     })
+//     .catch((err) => console.log(err));
+// };
+
+exports.getLogin = (req, res, next) => {
+  console.log(req.session.isLoggedIn);
+  res.render("login", {
+    pageTitle: "Login",
+  });
+};
+
+// exports.postLogin = (req, res, next) => {
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   console.log(email);
+//   User.findOne({ email: email, password: password })
+//     .then((user) => {
+//       req.user = user;
+//       next();
+//       res.redirect("/");
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+// };
+
+exports.postLogin = (req, res, next) => {
+  const email = req.body.email;
+  User.findOne({ email: email })
     .then((user) => {
-      req.user = user;
-      next();
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save((err) => {
+        console.log(err);
+        res.redirect("/");
+        console.log(user);
+      });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
+// exports.postLogin = (req, res, next) => {
+//   const email = req.body.email;
+//   const password = req.body.password;
+//   console.log(email);
+
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(422).render("auth/login", {
+//       path: "/login",
+//       pageTitle: "Login",
+//       errorMessage: errors.array()[0].msg,
+//       oldInput: {
+//         email: email,
+//         password: password,
+//       },
+//       validationErrors: errors.array(),
+//     });
+//   }
+
+//   User.findOne({ email: email })
+//     .then((user) => {
+//       console.log(user);
+//       if (!user) {
+//         return res.status(422).render("login", {
+//           path: "/login",
+//           pageTitle: "Login",
+//           errorMessage: "Invalid email or password.",
+//           oldInput: {
+//             email: email,
+//             password: password,
+//           },
+//           validationErrors: [],
+//         });
+//       }
+//       bcrypt
+//         .compare(password, user.password)
+//         .then((doMatch) => {
+//           if (doMatch) {
+//             req.session.isLoggedIn = true;
+//             req.session.user = user;
+//             return req.session.save((err) => {
+//               console.log(err);
+//               res.redirect("/");
+//             });
+//           }
+//           return res.status(422).render("login", {
+//             path: "/login",
+//             pageTitle: "Login",
+//             errorMessage: "Invalid email or password.",
+//             oldInput: {
+//               email: email,
+//               password: password,
+//             },
+//             validationErrors: [],
+//           });
+//         })
+//         .catch((err) => {
+//           console.log(err);
+//           res.redirect("/login");
+//         });
+//     })
+//     .catch((err) => {
+//       const error = new Error(err);
+//       error.httpStatusCode = 500;
+//       return next(error);
+//     });
+// };
+
+exports.postLogout = (req, res, next) => {
+  req.session.destroy((err) => {
+    console.log(err);
+    res.redirect("/");
+  });
 };
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
-  console.log(req.user);
-  const user = req.user;
-  res.render("home", {
-    user: user,
-    pageTitle: "Trang chủ",
-    active: { home: true },
-  });
+  console.log(req.session.user);
+  const user = req.session.user;
+  if (user) {
+    res.render("home", {
+      user: user,
+      pageTitle: "Trang chủ",
+      active: { home: true },
+      isAuthenticated: req.session.isLoggedIn,
+    });
+  } else {
+    res.render("login", {
+      pageTitle: "Login",
+      active: { login: true },
+    });
+  }
 };
 
 // Get About Page
 exports.getAbout = (req, res, next) => {
   res.render("about", {
     pageTitle: "Giới thiệu",
-    user: req.user,
+    user: req.session.user,
     active: { about: true },
+    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -41,6 +172,7 @@ exports.getEditUser = (req, res, next) => {
         pageTitle: user.name,
         user: user,
         active: { user: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -60,22 +192,23 @@ exports.postEditUser = (req, res, next) => {
 
 // Get all statistics of attendance
 exports.getWorkingHourStatistic = (req, res, next) => {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   user
     .getStatistic()
     .then((statistic) => {
       res.render("workingHourStatistic", {
         pageTitle: "Thông tin giờ làm",
-        user: req.user,
+        user: req.session.user,
         workingHourStatistic: statistic,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
 };
 
 exports.getSalaryStatistic = (req, res, next) => {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
   let totalSalary = 0;
@@ -139,9 +272,10 @@ exports.getSalaryStatistic = (req, res, next) => {
     .then((salaryStatistic) => {
       res.render("salaryStatistic", {
         pageTitle: "Thông tin bảng lương",
-        user: req.user,
+        user: req.session.user,
         salaryStatistic: salaryStatistic,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -149,7 +283,7 @@ exports.getSalaryStatistic = (req, res, next) => {
 
 // Get Working Hour Statistic with Wildcard
 exports.getWorkingHourStatisticSearch = function (req, res, next) {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const searchFromDate = new Date(req.query.searchFromDate);
   const searchToDate = new Date(req.query.searchToDate);
   let currStatistic = [];
@@ -163,13 +297,14 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
       });
       res.render("workingHourStatistic", {
         pageTitle: "Tra cứu thông tin giờ làm",
-        user: req.user,
+        user: req.session.user,
         workingHourStatistic: currStatistic,
         searchFromDate: searchFromDate,
         searchToDate: searchToDate,
         isNaNSearchFromDate: isNaN(searchFromDate),
         isNaNSearchToDate: isNaN(searchToDate),
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -179,7 +314,7 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
 
 // Get Salary Statistic with Wildcard
 exports.getSalaryStatisticSearch = function (req, res, next) {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
   const searchMonth = new Date(req.query.searchMonth);
@@ -256,12 +391,13 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
     .then(() => {
       res.render("salaryStatistic", {
         pageTitle: "Thông tin bảng lương",
-        user: req.user,
+        user: req.session.user,
         salaryStatistic: currStatistic,
         searchMonth: `${
           searchMonth.getUTCMonth() + 1
         }/${searchMonth.getUTCFullYear()}`,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

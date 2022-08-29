@@ -2,6 +2,6 @@
 exports.getError = (req, res, next) => {
   res.render("error404", {
     pageTitle: "Không tìm thấy trang",
-    user: req.user,
+    user: req.session.user,
   });
 };
