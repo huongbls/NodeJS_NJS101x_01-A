@@ -1,0 +1,69 @@
+<div class="card card-body">
+  <h3>Thêm nhân viên mới</h3>
+  <form action="/admin" method="post">
+    <div class="form-group">
+      <label for="staffId">Mã nhân viên</label>
+      <input type="text" class="form-control" name="staffId" required />
+    </div>
+    <div class="form-group">
+      <label for="fullname">Họ và tên</label>
+      <input type="text" class="form-control" name="fullname" required />
+    </div>
+    <div class="form-group">
+      <label for="doB">Ngày sinh</label>
+      <input
+        type="text"
+        class="form-control"
+        name="doB"
+        placeholder="dd/mm/yyyy"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="startDate">Ngày vào Công ty</label>
+      <input
+        type="text"
+        class="form-control"
+        name="startDate"
+        placeholder="dd/mm/yyyy"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="salaryScale">Lương cơ bản</label>
+      <input
+        type="number"
+        class="form-control"
+        name="salaryScale"
+        step="500000"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="department">Phòng ban</label>
+      <select class="form-control" name="department">
+        <option selected="true" disabled="disabled">Chọn phòng ban</option>
+        <option value="HR">HR</option>
+        <option value="GA">GA</option>
+        <option value="IT">IT</option>
+        <option value="BD">BD</option>
+        <option value="Kế toán">Kế toán</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="annualLeave">Ngày phép</label>
+      <input
+        type="number"
+        class="form-control"
+        name="annualLeave"
+        step="1"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="imageUrl">Ảnh đại diện</label>
+      <input type="String" class="form-control" name="imageUrl" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Thêm nhân viên</button>
+  </form>
+</div>

@@ -25,6 +25,7 @@ exports.getAttendace = (req, res, next) => {
         user: req.user,
         date: new Date(),
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -97,6 +98,7 @@ exports.getAttendanceDetails = (req, res, next) => {
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

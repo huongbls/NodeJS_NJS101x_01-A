@@ -21,6 +21,7 @@ exports.getAbsence = (req, res, next) => {
         user: req.user,
         absence: absence,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -81,6 +82,7 @@ exports.getAbsenceDetails = (req, res, next) => {
         user: req.user,
         absence: absence,
         active: { timesheet: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));

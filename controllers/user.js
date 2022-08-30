@@ -1,24 +1,14 @@
 const User = require("../models/user");
-
-// Check if user is logged in to add new attendance
-exports.loggedIn = function (req, res, next) {
-  User.findById("62f7766d4d90b2028b233de2")
-    .lean()
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => console.log(err));
-};
+// const crypto = require("crypto");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
-  console.log(req.user);
-  const user = req.user;
+  const user = req.session.user;
   res.render("home", {
     user: user,
     pageTitle: "Trang chủ",
     active: { home: true },
+    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -28,6 +18,7 @@ exports.getAbout = (req, res, next) => {
     pageTitle: "Giới thiệu",
     user: req.user,
     active: { about: true },
+    isAuthenticated: req.session.isLoggedIn,
   });
 };
 
@@ -41,6 +32,7 @@ exports.getEditUser = (req, res, next) => {
         pageTitle: user.name,
         user: user,
         active: { user: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -60,22 +52,23 @@ exports.postEditUser = (req, res, next) => {
 
 // Get all statistics of attendance
 exports.getWorkingHourStatistic = (req, res, next) => {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   user
     .getStatistic()
     .then((statistic) => {
       res.render("workingHourStatistic", {
         pageTitle: "Thông tin giờ làm",
-        user: req.user,
+        user: req.session.user,
         workingHourStatistic: statistic,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
 };
 
 exports.getSalaryStatistic = (req, res, next) => {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
   let totalSalary = 0;
@@ -139,9 +132,10 @@ exports.getSalaryStatistic = (req, res, next) => {
     .then((salaryStatistic) => {
       res.render("salaryStatistic", {
         pageTitle: "Thông tin bảng lương",
-        user: req.user,
+        user: req.session.user,
         salaryStatistic: salaryStatistic,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
@@ -149,7 +143,7 @@ exports.getSalaryStatistic = (req, res, next) => {
 
 // Get Working Hour Statistic with Wildcard
 exports.getWorkingHourStatisticSearch = function (req, res, next) {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const searchFromDate = new Date(req.query.searchFromDate);
   const searchToDate = new Date(req.query.searchToDate);
   let currStatistic = [];
@@ -163,13 +157,14 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
       });
       res.render("workingHourStatistic", {
         pageTitle: "Tra cứu thông tin giờ làm",
-        user: req.user,
+        user: req.session.user,
         workingHourStatistic: currStatistic,
         searchFromDate: searchFromDate,
         searchToDate: searchToDate,
         isNaNSearchFromDate: isNaN(searchFromDate),
         isNaNSearchToDate: isNaN(searchToDate),
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => {
@@ -179,7 +174,7 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
 
 // Get Salary Statistic with Wildcard
 exports.getSalaryStatisticSearch = function (req, res, next) {
-  const user = new User(req.user);
+  const user = new User(req.session.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
   const searchMonth = new Date(req.query.searchMonth);
@@ -256,12 +251,13 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
     .then(() => {
       res.render("salaryStatistic", {
         pageTitle: "Thông tin bảng lương",
-        user: req.user,
+        user: req.session.user,
         salaryStatistic: currStatistic,
         searchMonth: `${
           searchMonth.getUTCMonth() + 1
         }/${searchMonth.getUTCFullYear()}`,
         active: { record: true },
+        isAuthenticated: req.session.isLoggedIn,
       });
     })
     .catch((err) => console.log(err));
