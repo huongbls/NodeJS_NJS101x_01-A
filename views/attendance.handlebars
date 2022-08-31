@@ -1,7 +1,7 @@
 <div class="card-deck mt-3">
   <div class="card bg-light">
     <div class="card-body text-left">
-      {{#unless user.isWorking}}
+      {{#unless isWorking}}
         <h4 class="card-text mb-3">Điểm danh bắt đầu</h4>
         <form action="/attendance?type=start" method="POST">
           <div class="form-group">
@@ -10,7 +10,7 @@
               type="text"
               class="form-control"
               name="name"
-              value="{{user.name}}"
+              value="{{userName}}"
               disabled
             />
           </div>

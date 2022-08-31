@@ -18,7 +18,8 @@ exports.getAbsence = (req, res, next) => {
     .then((absence) => {
       res.render("absence", {
         pageTitle: "Đăng ký nghỉ",
-        user: req.user,
+        user: req.session.user,
+        annualLeave: req.user.annualLeave,
         absence: absence,
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -43,30 +44,48 @@ exports.postAbsence = (req, res, next) => {
   const annualLeave = req.user.annualLeave;
   const daysRemain = annualLeave - dayLeaveRequest;
 
-  Absence.findOne({ userId: req.user._id })
-    .then((absence) => {
-      absenceDateArr.forEach((date) => {
-        absence.registerLeave.push({
-          fromDate: date,
-          toDate: date,
-          hours: countHours,
-          fromHour: req.body.fromHour,
-          toHour: req.body.toHour,
-          reason: req.body.reason,
+  // Nếu số ngày đk nghỉ nhỏ hơn số ngày phép còn lại thì cập nhập dữ liệu model, nếu không thì đưa ra thông báo lỗi.
+  if (dayLeaveRequest <= annualLeave) {
+    Absence.findOne({ userId: req.user._id })
+      .then((absence) => {
+        absenceDateArr.forEach((date) => {
+          absence.registerLeave.push({
+            fromDate: date,
+            toDate: date,
+            hours: countHours,
+            fromHour: req.body.fromHour,
+            toHour: req.body.toHour,
+            reason: req.body.reason,
+          });
         });
-      });
-      return absence.save();
-    })
-    .then((absence) => {
-      res.redirect("/absence-details");
-    })
-    .catch((err) => console.log(err));
+        return absence.save();
+      })
+      .then((absence) => {
+        res.redirect("/absence-details");
+      })
+      .catch((err) => console.log(err));
 
-  // Update số ngày nghỉ còn lại
-  User.updateOne({ annualLeave: daysRemain }, function (err, res) {
-    if (err) throw err;
-    console.log(res);
-  });
+    // Update số ngày nghỉ còn lại
+    User.updateOne({ annualLeave: daysRemain }, function (err, res) {
+      if (err) throw err;
+      console.log(res);
+    });
+  } else {
+    res.render("absence", {
+      pageTitle: "Đăng ký nghỉ",
+      user: req.session.user,
+      fromDate: req.body.fromDate,
+      toDate: req.body.toDate,
+      fromHour: req.body.fromHour,
+      toHour: req.body.toHour,
+      reason: req.body.reason,
+      annualLeave: req.user.annualLeave,
+      active: { timesheet: true },
+      isAuthenticated: req.session.isLoggedIn,
+      errMessage:
+        "Đăng ký không thành công. Số ngày đăng ký vượt quá số ngày phép còn lại.",
+    });
+  }
 };
 
 // Get Absence Details Page
@@ -79,8 +98,9 @@ exports.getAbsenceDetails = (req, res, next) => {
     .then((absence) => {
       res.render("absence-details", {
         pageTitle: "Nghỉ phép",
-        user: req.user,
+        user: req.session.user,
         absence: absence,
+        annualLeave: req.user.annualLeave,
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
       });

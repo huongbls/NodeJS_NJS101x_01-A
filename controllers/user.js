@@ -3,23 +3,34 @@ const User = require("../models/user");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
-  const user = req.session.user;
-  res.render("home", {
-    user: user,
-    pageTitle: "Trang chủ",
-    active: { home: true },
-    isAuthenticated: req.session.isLoggedIn,
-  });
+  if (req.session.isLoggedIn) {
+    const user = req.user;
+    res.render("home", {
+      user: req.session.user,
+      userName: user.name,
+      workplace: user.workplace,
+      isWorking: user.isWorking,
+      pageTitle: "Trang chủ",
+      active: { home: true },
+      isAuthenticated: req.session.isLoggedIn,
+    });
+  } else {
+    res.redirect("/login");
+  }
 };
 
 // Get About Page
 exports.getAbout = (req, res, next) => {
-  res.render("about", {
-    pageTitle: "Giới thiệu",
-    user: req.user,
-    active: { about: true },
-    isAuthenticated: req.session.isLoggedIn,
-  });
+  if (req.session.isLoggedIn) {
+    res.render("about", {
+      pageTitle: "Giới thiệu",
+      user: req.session.user,
+      active: { about: true },
+      isAuthenticated: req.session.isLoggedIn,
+    });
+  } else {
+    res.redirect("/login");
+  }
 };
 
 // GEt Edit User Page

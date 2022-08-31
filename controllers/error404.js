@@ -1,7 +1,11 @@
 // Get Page Error 404
 exports.getError = (req, res, next) => {
-  res.render("error404", {
-    pageTitle: "Không tìm thấy trang",
-    user: req.session.user,
-  });
+  if (req.session.isLoggedIn) {
+    res.render("error404", {
+      pageTitle: "Không tìm thấy trang",
+      user: req.session.user,
+    });
+  } else {
+    res.redirect("/login");
+  }
 };

@@ -20,9 +20,12 @@ exports.getAttendace = (req, res, next) => {
       return result;
     })
     .then((attendance) => {
+      console.log(req.user);
       res.render("attendance", {
         pageTitle: "Điểm danh",
-        user: req.user,
+        user: req.session.user,
+        isWorking: req.user.isWorking,
+        userName: req.user.name,
         date: new Date(),
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -94,7 +97,7 @@ exports.getAttendanceDetails = (req, res, next) => {
       }
       res.render("attendance-details", {
         pageTitle: "Chi tiết công việc",
-        user: req.user,
+        user: req.session.user,
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
         active: { timesheet: true },
