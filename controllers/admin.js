@@ -44,15 +44,14 @@ exports.getEditEmployee = (req, res, next) => {
   if (!editMode) {
     return res.redirect("/");
   }
-  const staff_Id = req.params.staffId;
+  const staff_Id = req.params.userId;
   User.findById(staff_Id)
     .then((employee) => {
       if (!employee) {
         return res.redirect("/");
       }
-      res.render("admin/edit-employee", {
-        pageTitle: "Edit Employee",
-        path: "/admin/edit-employee",
+      res.render("admin/add-employee", {
+        pageTitle: "Thay đổi thông tin nhân viên",
         editing: editMode,
         employee: employee,
       });
@@ -108,8 +107,11 @@ exports.getEmployees = (req, res, next) => {
 };
 
 exports.postDeleteEmployee = (req, res, next) => {
-  const staff_Id = req.body.productId;
-  User.findByIdAndRemove(staff_Id) // findByIdAndRemove là phương thức có sẵn của mongoose
+  const staffId = req.params._id;
+  console.log(req.params);
+  console.log(req.user);
+  console.log(staffId);
+  User.findByIdAndRemove(staffId) // findByIdAndRemove là phương thức có sẵn của mongoose
     .then(() => {
       console.log("DESTROYED PRODUCT");
       res.redirect("/admin/employees");

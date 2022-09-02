@@ -10,6 +10,8 @@ const adminRoutes = require("./routes/admin");
 const User = require("./models/user");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
+const flash = require("connect-flash");
+const multer = require("multer");
 
 // Import Controllers
 const errorControllers = require("./controllers/error404");
@@ -19,6 +21,28 @@ const store = new MongoDBStore({
   uri: "mongodb+srv://huong:OiFcLLuMsc9aIYBh@asm1.7szamyk.mongodb.net/test",
   collection: "sessions",
 });
+
+const fileStorage = multer.diskStorage({
+  // destination: (req, file, cb) => {
+  //   cb(null, "images");
+  // },
+  destination: "./images",
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString().slice(0, 10) + "-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 // Define Template Engine
 app.engine(
@@ -84,8 +108,15 @@ app.set("view engine", "handlebars");
 // app.use(morgan("combined"));
 
 // Define Static Folder
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
+
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/images", express.static(path.join(__dirname, "images")));
+
 app.use(
   session({
     secret: "my secret",
@@ -95,7 +126,7 @@ app.use(
   })
 );
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(flash());
 
 app.use((req, res, next) => {
   if (!req.session.user) {

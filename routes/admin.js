@@ -9,10 +9,10 @@ router.post("/add-employee", adminController.postAddEmployee);
 // /admin/products => GET
 router.get("/employees", adminController.getEmployees);
 
-// router.get("/edit-employee/:staffId", adminController.getEditEmployee);
+router.get("/edit-employee/:userId", adminController.getEditEmployee);
 
-// router.post("/edit-employee", adminController.postEditEmployee);
+router.post("/edit-employee", adminController.postEditEmployee);
 
-// router.post("/delete-employee", adminController.postDeleteEmployee);
+router.post("/delete-employee", adminController.postDeleteEmployee);
 
 module.exports = router;

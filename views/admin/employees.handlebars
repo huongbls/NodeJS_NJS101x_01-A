@@ -8,11 +8,18 @@
           <div class="card-body">
             <p class="card-title">{{name}}</p>
             <p class="card-text">Phòng: {{department}}</p>
-            <form action="#" method="POST" class="float-left">
-              <input type="hidden" value="" name="productId" />
+            <form
+              action="/admin/delete-employee"
+              method="POST"
+              class="float-left"
+            >
+              <input type="hidden" name="_id" />
               <button class="btn" type="submit">Delete</button>
             </form>
-            <a class="btn btn-primary float-right" href="#">Edit</a>
+            <a
+              class="btn btn-primary float-right"
+              href="/admin/edit-employee"
+            >Edit</a>
           </div>
         </div>
       </div>
