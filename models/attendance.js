@@ -24,7 +24,7 @@ const attendanceSchema = new Schema({
 attendanceSchema.statics.attendanceMonthRange = function (
   startDate,
   endDate,
-  steps = 10
+  steps = 1
 ) {
   const monthArray = [];
   let currentDate = new Date(startDate);

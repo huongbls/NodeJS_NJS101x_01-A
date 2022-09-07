@@ -23,10 +23,10 @@ const store = new MongoDBStore({
 });
 
 const fileStorage = multer.diskStorage({
-  // destination: (req, file, cb) => {
-  //   cb(null, "images");
-  // },
-  destination: "./images",
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  // destination: "./images",
   filename: (req, file, cb) => {
     cb(null, new Date().toISOString().slice(0, 10) + "-" + file.originalname);
   },
@@ -36,6 +36,7 @@ const fileFilter = (req, file, cb) => {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
+    file.mimetype === "image/JPG" ||
     file.mimetype === "image/jpeg"
   ) {
     cb(null, true);
@@ -160,9 +161,10 @@ dbConnect()
             salaryScale: 1.0,
             startDate: new Date("2022-05-31"),
             department: "IT",
+            position: "Trưởng phòng",
             annualLeave: 12,
-            image:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTc_NEc8A16sOFBrLMoOcBUwFZlZ84A9UzfRw&usqp=CAU",
+            image: "http://localhost:3333/images/male-icon.png",
+            gender: "Nam",
           });
           user.save();
         }

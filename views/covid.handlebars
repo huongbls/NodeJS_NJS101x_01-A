@@ -1,5 +1,9 @@
-<h1>Thông tin Covid cá nhân</h1>
-<a href="/covid-details">Xem chi tiết</a>
+<h4>Thông tin Covid cá nhân</h4>
+<a href="/covid-details">Xem chi tiết Cá nhân</a>
+<br>
+{{#if manager}}
+<a href="/covid-details-staffs">Xem chi tiết Nhân viên</a>
+{{/if}}
 <div class="card-deck mt-3">
   <div class="card bg-light">
     <div class="card-body text-left">
@@ -24,6 +28,16 @@
     <div class="card-body text-left">
       <h6 class="card-text mb-3">Thông tin tiêm vắcxin</h6>
       <form action="/covid?type=vaccine" id="vaccine-details" method="POST">
+        <div class="form-group">
+          <label for="injectedNo">Mũi tiêm</label>
+          <select class="form-control" name="injectedNo">
+              <option selected="true" disabled="disabled">Chọn mũi tiêm</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+        </div>
         <div class="form-group">
           <label for="vaccineDate1">Ngày tiêm</label>
           <input

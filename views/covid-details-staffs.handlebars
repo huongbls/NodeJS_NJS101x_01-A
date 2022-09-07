@@ -1,22 +1,30 @@
 <div class="container">
-  <h4>{{user.name}}</h4>
-  <a href="/covid">Đăng ký thông tin covid</a>
+  <h4>Thông tin Covid phòng {{department}} </h4>
+  <a href="/covid">Quay lại</a>
+  <br>
+  <a href="/covid-details-staffs/pdf">In ra PDF</a>
   <h6 class="mt-3">Thông tin thân nhiệt</h6>
   <table class="table">
     <thead class="thead-light">
       <tr>
+        <th>Họ và tên</th>
         <th>Ngày</th>
         <th>Giờ</th>
         <th>Nhiệt độ</th>
       </tr>
     </thead>
     <tbody>
-      {{#each covid.bodyTemperatures}}
-        <tr>
-          <td>{{tolocaledatestring date}}</td>
-          <td>{{getHours date}}:{{getMinutes date}}</td>
-          <td>{{value}}<sup>o</sup>C</td>
-        </tr>
+      {{#each covid}}
+        {{#each bodyTemperatures}}
+          <tr>
+            {{#ifCond @index '===' 0}}
+            <td rowspan="{{../bodyTemperatures.length}}">{{../name}}</td>
+            {{/ifCond}}
+            <td>{{tolocaledatestring date}}</td>
+            <td>{{getHours date}}:{{getMinutes date}}</td>
+            <td>{{value}}<sup>o</sup>C</td>
+          </tr>
+        {{/each}}
       {{/each}}
     </tbody>
   </table>
@@ -26,18 +34,24 @@
   <table class="table">
     <thead class="thead-light">
       <tr>
+        <th>Họ và tên</th>
         <th>Ngày</th>
         <th>Mũi</th>
         <th>Tên vắcxin</th>
       </tr>
     </thead>
     <tbody>
-      {{#each covid.vaccine}}
+      {{#each covid}}
+      {{#each vaccine}}
         <tr>
-          <td>{{tolocaledatestring date}}</td>
+          {{#ifCond @index '===' 0}}
+          <td rowspan="{{../vaccine.length}}">{{../name}}</td>
+          {{/ifCond}}
+          <td>{{tolocaledatestring date}}</td>  
           <td>Mũi {{injectedNo}}</td>
           <td>{{name}}</td>
         </tr>
+      {{/each}}
       {{/each}}
     </tbody>
   </table>
@@ -47,16 +61,22 @@
   <table class="table">
     <thead class="thead-light">
       <tr>
+        <th>Họ và tên</th>
         <th>Ngày</th>
         <th>Kết quả</th>
       </tr>
     </thead>
     <tbody>
-      {{#each covid.positive}}
+      {{#each covid}}
+      {{#each positive}}
         <tr>
+          {{#ifCond @index '===' 0}}
+          <td rowspan="{{../positive.length}}">{{../name}}</td>
+          {{/ifCond}}
           <td>{{tolocaledatestring date}}</td>
           <td>Dương tính covid</td>
         </tr>
+      {{/each}}     
       {{/each}}
     </tbody>
   </table>

@@ -4,6 +4,7 @@ exports.getAddEmployee = (req, res, next) => {
   res.render("admin/add-employee", {
     pageTitle: "Thêm nhân viên",
     isAuthenticated: req.session.isLoggedIn,
+    user: req.session.user,
   });
 };
 
@@ -15,8 +16,13 @@ exports.postAddEmployee = (req, res, next) => {
   const startDate = req.body.startDate;
   const salaryScale = req.body.salaryScale;
   const department = req.body.department;
+  const position = req.body.position;
   const annualLeave = req.body.annualLeave;
-  const imageUrl = "https://www.w3schools.com/bootstrap4/img_avatar3.png";
+  const gender = req.body.gender;
+  const imageUrl =
+    gender === "Nam"
+      ? "http://localhost:3333/images/male-icon.png"
+      : "http://localhost:3333/images/female-icon.png";
   const employee = new User({
     name: name,
     email: email,
@@ -25,8 +31,10 @@ exports.postAddEmployee = (req, res, next) => {
     startDate: startDate,
     salaryScale: salaryScale,
     department: department,
+    position: position,
     annualLeave: annualLeave,
     image: imageUrl,
+    gender: gender,
   });
   employee
     .save()
@@ -54,6 +62,7 @@ exports.getEditEmployee = (req, res, next) => {
         pageTitle: "Thay đổi thông tin nhân viên",
         editing: editMode,
         employee: employee,
+        user: req.session.user,
       });
     })
     .catch((err) => console.log(err));
@@ -67,8 +76,10 @@ exports.postEditEmployee = (req, res, next) => {
   const updatedstartDate = req.body.startDate;
   const updatedsalaryScale = req.body.salaryScale;
   const updateddepartment = req.body.department;
+  const updatedposition = req.body.position;
   const updatedannualLeave = req.body.annualLeave;
   const updatedImageUrl = req.body.imageUrl;
+  const updatedGender = req.body.gender;
   console.log(req.body);
   User.findById(staff_Id)
     .then((employee) => {
@@ -78,8 +89,10 @@ exports.postEditEmployee = (req, res, next) => {
       employee.startDate = updatedstartDate;
       employee.salaryScale = updatedsalaryScale;
       employee.department = updateddepartment;
+      employee.position = updatedposition;
       employee.annualLeave = updatedannualLeave;
       employee.imageUrl = updatedImageUrl;
+      employee.gender = updatedGender;
       return employee.save();
     })
     .then((result) => {
@@ -99,6 +112,7 @@ exports.getEmployees = (req, res, next) => {
         employees: employees,
         pageTitle: "Danh sách nhân viên",
         isAuthenticated: req.session.isLoggedIn,
+        user: req.session.user,
       });
     })
     .catch((err) => {

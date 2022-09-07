@@ -5,24 +5,8 @@ const absenceController = require("../controllers/absence");
 const attendanceController = require("../controllers/attendance");
 const authController = require("../controllers/auth");
 const isAuth = require("../middleware/is-auth");
+const isManager = require("../middleware/is-manager");
 const router = express.Router();
-const multer = require("multer");
-const path = require("path");
-
-//Set Storage Engine
-const storage = multer.diskStorage({
-  destination: "../images",
-  filename: function (req, file, cb) {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname)
-    );
-  },
-});
-
-const upload = multer({
-  storage: storage,
-});
 
 // Home Page
 router.get("/", userController.getHome);
@@ -34,8 +18,8 @@ router.post("/logout", authController.postLogout);
 // router.get("/", userController.loggedIn);
 
 // User Details Page
-router.get("/edit-user/:userId", isAuth, userController.getEditUser);
-router.post("/edit-user", upload.single("image"), userController.postEditUser);
+router.get("/edit-user/:userId", userController.getEditUser);
+router.post("/edit-user", userController.postEditUser);
 
 // About Page
 router.get("/about", userController.getAbout);
@@ -71,6 +55,18 @@ router.post("/absence", absenceController.postAbsence);
 // Covid Page
 router.get("/covid", isAuth, covidController.getCovid);
 router.get("/covid-details", isAuth, covidController.getCovidDetails);
-router.post("/covid", covidController.postCovid);
+router.post("/covid-details-staffs", covidController.postCovid);
+router.get(
+  "/covid-details-staffs",
+  isAuth,
+  isManager,
+  covidController.getCovidDetailsStaffs
+);
+router.get(
+  "/covid-details-staffs/pdf",
+  isAuth,
+  isManager,
+  covidController.getPDF
+);
 
 module.exports = router;

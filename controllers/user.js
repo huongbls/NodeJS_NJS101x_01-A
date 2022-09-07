@@ -1,12 +1,11 @@
 const User = require("../models/user");
 const fileHelper = require("../ultil/file");
 const path = require("path");
-// const crypto = require("crypto");
 
 // Get Home Page
 exports.getHome = (req, res, next) => {
+  const user = req.user;
   if (req.session.isLoggedIn) {
-    const user = req.user;
     res.render("home", {
       user: req.session.user,
       userName: user.name,
@@ -37,14 +36,13 @@ exports.getAbout = (req, res, next) => {
 
 // GEt Edit User Page
 exports.getEditUser = (req, res, next) => {
-  // console.log(req.params.userId);
   User.findById(req.params.userId)
     .lean()
     .then((user) => {
       res.render("edit-user", {
         pageTitle: user.name,
         user: user,
-        image: user.image,
+        image: "/" + user.image,
         active: { user: true },
         isAuthenticated: req.session.isLoggedIn,
       });
@@ -56,65 +54,144 @@ exports.getEditUser = (req, res, next) => {
 exports.postEditUser = (req, res, next) => {
   const { id } = req.body;
   const imageFile = req.file;
-  console.log(imageFile.path);
   User.findById(id)
     .then((user) => {
-      if (image) {
-        fileHelper.deleteFile(user.image);
+      if (user.image) {
+        // fileHelper.deleteFile(user.image);
         user.image = imageFile.path;
       }
-      // user.image = imageFile.path;
       return user.save();
     })
     .then((result) => {
       console.log("UPDATED IMAGE!");
-      res.redirect(`/`);
+      res.redirect(`/edit-user/${id}`);
     })
     .catch((err) => console.log(err));
-
-  // deleteFile(req.user.image);
-  // const avatar = req.file;
-  // if (!avatar) {
-  //   console.log("khong co avatar");
-  //   res.redirect("/");
-  //   // res.render("other-info/staff-info", {
-  //   //   path: "/staff-info",
-  //   //   pageTitle: "Staff Info",
-  //   //   staffs: req.session.staff,
-  //   // });
-  // }
-  // const image = avatar.path;
-  // req.user.image = image;
-  // req.user
-  //   .save()
-  //   .then((result) => {
-  //     console.log("postStaffInfo", result);
-  //     res.redirect("/edit-user");
-  //   })
-  //   .catch((err) => console.log(err));
 };
 
 // Get all statistics of attendance
-exports.getWorkingHourStatistic = (req, res, next) => {
-  const user = new User(req.session.user);
+exports.getWorkingHourStatistic = async (req, res, next) => {
+  const user = new User(req.user);
+  const page = +req.query.page || 1;
+  const ITEMS_PER_PAGE = +req.query.rowNum || 10;
+  let totalWorkingDays;
+  const manager = await User.findOne({
+    department: user.department,
+    position: "manager",
+  });
+  const managerName = manager.name;
+  const managerId = manager._id;
   user
     .getStatistic()
     .then((statistic) => {
-      res.render("workingHourStatistic", {
-        pageTitle: "Thông tin giờ làm",
-        user: req.session.user,
-        workingHourStatistic: statistic,
-        active: { record: true },
-        isAuthenticated: req.session.isLoggedIn,
-      });
+      console.log(statistic.filter((x) => x.totalHour >= 0));
+      totalWorkingDays = statistic.filter((x) => x.totalHour >= 0).length;
+      if (totalWorkingDays) {
+        res.render("workingHourStatistic", {
+          pageTitle: "Thông tin giờ làm",
+          user: req.session.user,
+          workingHourStatistic: statistic
+            .filter((x) => x.totalHour >= 0)
+            .slice(
+              ITEMS_PER_PAGE * (page - 1),
+              ITEMS_PER_PAGE * (page - 1) + ITEMS_PER_PAGE
+            ),
+          totalWorkingDays: totalWorkingDays,
+          managerName: managerName,
+          managerId: managerId,
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+          ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+          currentPage: page,
+          hasNextPage: ITEMS_PER_PAGE * page < totalWorkingDays,
+          hasPreviousPage: page > 1,
+          nextPage: page + 1,
+          previousPage: page - 1,
+          lastPage: Math.ceil(totalWorkingDays / ITEMS_PER_PAGE),
+        });
+      } else {
+        res.render("workingHourStatistic", {
+          pageTitle: "Thông tin giờ làm",
+          user: req.session.user,
+          workingHourStatistic: statistic,
+          totalWorkingDays: totalWorkingDays,
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+        });
+      }
     })
     .catch((err) => console.log(err));
 };
 
+// Get Working Hour Statistic with Wildcard
+exports.getWorkingHourStatisticSearch = function (req, res, next) {
+  const user = new User(req.user);
+  const searchFromDate = new Date(req.query.searchFromDate);
+  const searchToDate = new Date(req.query.searchToDate);
+  const page = +req.query.page || 1;
+  const ITEMS_PER_PAGE = +req.query.rowNum || 10;
+  let totalWorkingDays;
+  let currStatistic = [];
+  user
+    .getStatistic()
+    .then((statistic) => {
+      statistic.forEach((x) => {
+        if (x.date <= searchToDate && x.date >= searchFromDate) {
+          currStatistic.push(x);
+        }
+      });
+      totalWorkingDays = currStatistic.filter((x) => x.totalHour >= 0).length;
+      if (totalWorkingDays) {
+        res.render("workingHourStatistic", {
+          pageTitle: "Tra cứu thông tin giờ làm",
+          user: req.session.user,
+          workingHourStatistic: currStatistic
+            .filter((x) => x.totalHour >= 0)
+            .slice(
+              ITEMS_PER_PAGE * (page - 1),
+              ITEMS_PER_PAGE * (page - 1) + ITEMS_PER_PAGE
+            ),
+          totalWorkingDays: totalWorkingDays,
+          searchFromDate: req.query.searchFromDate,
+          searchToDate: req.query.searchToDate,
+          isNaNSearchFromDate: isNaN(searchFromDate),
+          isNaNSearchToDate: isNaN(searchToDate),
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+          ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+          currentPage: page,
+          hasNextPage: ITEMS_PER_PAGE * page < totalWorkingDays,
+          hasPreviousPage: page > 1,
+          nextPage: page + 1,
+          previousPage: page - 1,
+          lastPage: Math.ceil(totalWorkingDays / ITEMS_PER_PAGE),
+        });
+      } else {
+        res.render("workingHourStatistic", {
+          pageTitle: "Tra cứu thông tin giờ làm",
+          user: req.session.user,
+          workingHourStatistic: currStatistic,
+          searchFromDate: searchFromDate,
+          searchToDate: searchToDate,
+          isNaNSearchFromDate: isNaN(searchFromDate),
+          isNaNSearchToDate: isNaN(searchToDate),
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+        });
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+
 exports.getSalaryStatistic = (req, res, next) => {
-  const user = new User(req.session.user);
+  const user = new User(req.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
+  const page = +req.query.page || 1;
+  const ITEMS_PER_PAGE = +req.query.monthNum || 12;
+  let totalWorkingMonths;
   let totalSalary = 0;
   let totalHourForSalary = 0;
   let totalOvertimeForSalary = 0;
@@ -174,51 +251,41 @@ exports.getSalaryStatistic = (req, res, next) => {
       return salaryStatistic;
     })
     .then((salaryStatistic) => {
-      res.render("salaryStatistic", {
-        pageTitle: "Thông tin bảng lương",
-        user: req.session.user,
-        salaryStatistic: salaryStatistic,
-        active: { record: true },
-        isAuthenticated: req.session.isLoggedIn,
-      });
+      totalWorkingMonths = salaryStatistic.length;
+      if (totalWorkingMonths) {
+        res.render("salaryStatistic", {
+          pageTitle: "Thông tin bảng lương",
+          user: req.session.user,
+          salaryStatistic: salaryStatistic.slice(
+            ITEMS_PER_PAGE * (page - 1),
+            ITEMS_PER_PAGE * (page - 1) + ITEMS_PER_PAGE
+          ),
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+          ITEMS_PER_PAGE: ITEMS_PER_PAGE,
+          currentPage: page,
+          hasNextPage: ITEMS_PER_PAGE * page < totalWorkingMonths,
+          hasPreviousPage: page > 1,
+          nextPage: page + 1,
+          previousPage: page - 1,
+          lastPage: Math.ceil(totalWorkingMonths / ITEMS_PER_PAGE),
+        });
+      } else {
+        res.render("salaryStatistic", {
+          pageTitle: "Thông tin bảng lương",
+          user: req.session.user,
+          salaryStatistic: salaryStatistic,
+          active: { record: true },
+          isAuthenticated: req.session.isLoggedIn,
+        });
+      }
     })
     .catch((err) => console.log(err));
 };
 
-// Get Working Hour Statistic with Wildcard
-exports.getWorkingHourStatisticSearch = function (req, res, next) {
-  const user = new User(req.session.user);
-  const searchFromDate = new Date(req.query.searchFromDate);
-  const searchToDate = new Date(req.query.searchToDate);
-  let currStatistic = [];
-  user
-    .getStatistic()
-    .then((statistic) => {
-      statistic.forEach((x) => {
-        if (x.date <= searchToDate && x.date >= searchFromDate) {
-          currStatistic.push(x);
-        }
-      });
-      res.render("workingHourStatistic", {
-        pageTitle: "Tra cứu thông tin giờ làm",
-        user: req.session.user,
-        workingHourStatistic: currStatistic,
-        searchFromDate: searchFromDate,
-        searchToDate: searchToDate,
-        isNaNSearchFromDate: isNaN(searchFromDate),
-        isNaNSearchToDate: isNaN(searchToDate),
-        active: { record: true },
-        isAuthenticated: req.session.isLoggedIn,
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-};
-
 // Get Salary Statistic with Wildcard
 exports.getSalaryStatisticSearch = function (req, res, next) {
-  const user = new User(req.session.user);
+  const user = new User(req.user);
   const salaryStatistic = user.getWorkingMonths();
   const salaryScale = user.salaryScale;
   const searchMonth = new Date(req.query.searchMonth);
@@ -300,6 +367,7 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
         searchMonth: `${
           searchMonth.getUTCMonth() + 1
         }/${searchMonth.getUTCFullYear()}`,
+        month: req.query.searchMonth,
         active: { record: true },
         isAuthenticated: req.session.isLoggedIn,
       });

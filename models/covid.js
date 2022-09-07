@@ -19,12 +19,15 @@ const covidSchema = new Schema({
   ],
   vaccine: [
     {
+      injectedNo: {
+        type: Number,
+      },
       date: {
         type: Date,
       },
       name: {
         type: String,
-      }
+      },
     },
   ],
   positive: [

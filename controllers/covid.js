@@ -1,11 +1,14 @@
 const Covid = require("../models/covid");
+const User = require("../models/user");
+const fs = require("fs");
+const path = require("path");
+const PDFDocument = require("pdfkit");
 
 // Get Covid Page
 exports.getCovid = (req, res, next) => {
   Covid.findOne({ userId: req.session.user._id })
     .lean()
     .then((covid) => {
-      // Check if user has no covid data
       if (!covid) {
         const newCovid = new Covid({
           userId: req.session.user._id,
@@ -21,6 +24,7 @@ exports.getCovid = (req, res, next) => {
       res.render("covid", {
         pageTitle: "Thông tin Covid",
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
         vaccine: covid.vaccine,
         active: { covid: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -35,7 +39,6 @@ exports.postCovid = (req, res, next) => {
   console.log(req.body.temperature);
   Covid.findOne({ userId: req.session.user._id })
     .then((covid) => {
-      // Check type of covid-form (temperature, vaccine, positive)
       if (type === "temperature") {
         covid.bodyTemperatures.push({
           date: new Date(),
@@ -44,8 +47,12 @@ exports.postCovid = (req, res, next) => {
       } else if (type === "positive") {
         covid.positive.push({ date: req.body.positive });
       } else {
-        const { vaccineDate, vaccineName } = req.body;
-        covid.vaccine.push({ name: vaccineName, date: vaccineDate });
+        const { injectedNo, vaccineDate, vaccineName } = req.body;
+        covid.vaccine.push({
+          injectedNo: injectedNo,
+          name: vaccineName,
+          date: vaccineDate,
+        });
       }
       return covid.save();
     })
@@ -57,11 +64,9 @@ exports.postCovid = (req, res, next) => {
 
 // Get Covid Details Page
 exports.getCovidDetails = (req, res, next) => {
-  // Get Covid Details by User
   Covid.findOne({ userId: req.session.user._id })
     .lean()
     .then((covid) => {
-      // Check if user has no covid data
       if (covid) {
         return covid;
       } else {
@@ -84,4 +89,117 @@ exports.getCovidDetails = (req, res, next) => {
       });
     })
     .catch((err) => console.log(err));
+};
+
+exports.getCovidDetailsStaffs = async (req, res, next) => {
+  let covidStaffInfor = [];
+  const deptMembers = await User.find({
+    department: req.user.department,
+  }).lean();
+  const covidResult = await Covid.find().lean();
+  deptMembers.forEach((member) => {
+    covidStaffInfor.push({
+      _id: member._id,
+      name: member.name,
+      department: member.department,
+    });
+  });
+  covidStaffInfor.forEach((object) => {
+    covidResult.forEach((result) => {
+      if (object._id.toString() === result.userId.toString()) {
+        Object.assign(object, {
+          bodyTemperatures: result.bodyTemperatures,
+          vaccine: result.vaccine,
+          positive: result.positive,
+        });
+      }
+    });
+  });
+  console.log(covidStaffInfor);
+  res.render("covid-details-staffs", {
+    pageTitle: "Thông tin Covid",
+    user: req.session.user,
+    department: deptMembers[0].department,
+    covid: covidStaffInfor,
+    active: { covid: true },
+    isAuthenticated: req.session.isLoggedIn,
+  });
+};
+
+exports.getPDF = async (req, res, next) => {
+  let covidStaffInfor = [];
+  const deptMembers = await User.find({
+    department: req.user.department,
+  }).lean();
+  const covidResult = await Covid.find().lean();
+  const pdfName = "thongtincovid.pdf";
+  const pdfPath = path.join("data", "covid", pdfName);
+  const file = fs.createWriteStream(pdfPath);
+  const pdfDoc = new PDFDocument();
+  pdfDoc.registerFont(
+    "Roboto",
+    "../public/assets/fonts/RobotoCondensed-Light.ttf"
+  );
+
+  deptMembers.forEach((member) => {
+    covidStaffInfor.push({
+      _id: member._id,
+      name: member.name,
+      department: member.department,
+    });
+  });
+  covidStaffInfor.forEach((object) => {
+    covidResult.forEach((result) => {
+      if (object._id.toString() === result.userId.toString()) {
+        Object.assign(object, {
+          bodyTemperatures: result.bodyTemperatures,
+          vaccine: result.vaccine,
+          positive: result.positive,
+        });
+      }
+    });
+  });
+
+  pdfDoc.pipe(file);
+  pdfDoc.pipe(res);
+  pdfDoc
+    .fontSize(26)
+    .font("Roboto")
+    .text("Thông tin Covid phòng " + req.user.department);
+  pdfDoc.fontSize(12).text("  ");
+  covidStaffInfor.forEach((data) => {
+    pdfDoc.font("Roboto").text("Họ và tên: " + data.name);
+    pdfDoc.text("Nhiet do co the");
+    data.bodyTemperatures.forEach((temp) => {
+      pdfDoc.text(
+        "     Ngay: " +
+          temp.date.toLocaleDateString() +
+          "     Nhiet do: " +
+          temp.value +
+          " oC"
+      );
+    });
+    pdfDoc.text("Tiem vacxin");
+    data.vaccine.forEach((vaccine) => {
+      pdfDoc.text(
+        "     Ngay: " +
+          vaccine.date.toLocaleDateString() +
+          "     Mui " +
+          vaccine.injectedNo +
+          " - " +
+          vaccine.name
+      );
+    });
+    pdfDoc.text("Duong tinh covid");
+    data.positive.forEach((positive) => {
+      pdfDoc.text(
+        "     Ngay: " +
+          positive.date.toLocaleDateString() +
+          "     Duong tinh Covid"
+      );
+    });
+    pdfDoc.fontSize(12).text("  ");
+  });
+  // pdfDoc.text("---------------");
+  pdfDoc.end();
 };

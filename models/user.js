@@ -12,8 +12,10 @@ const userSchema = new Schema({
   salaryScale: { type: Number, required: true },
   startDate: { type: Date, required: true },
   department: { type: String, required: true },
+  position: { type: String, required: true },
   annualLeave: { type: Number, required: true },
   image: { type: String, required: true },
+  gender: { type: String, required: true },
   isWorking: { type: Boolean, default: false },
   workplace: { type: String },
 });
@@ -120,7 +122,7 @@ userSchema.methods.getWorkingMonths = function () {
   const monthArr = Attendance.attendanceMonthRange(
     this.startDate,
     new Date(),
-    10
+    1
   );
   monthArr.forEach((month) => {
     salaryStatistics.push({ month: month });
