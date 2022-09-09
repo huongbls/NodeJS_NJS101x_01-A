@@ -9,6 +9,7 @@ exports.getHome = (req, res, next) => {
     res.render("home", {
       user: req.session.user,
       userName: user.name,
+      manager: user.position === "manager" ? true : false,
       workplace: user.workplace,
       isWorking: user.isWorking,
       pageTitle: "Trang chủ",
@@ -26,6 +27,7 @@ exports.getAbout = (req, res, next) => {
     res.render("about", {
       pageTitle: "Giới thiệu",
       user: req.session.user,
+      manager: req.user.position === "manager" ? true : false,
       active: { about: true },
       isAuthenticated: req.session.isLoggedIn,
     });
@@ -42,6 +44,7 @@ exports.getEditUser = (req, res, next) => {
       res.render("edit-user", {
         pageTitle: user.name,
         user: user,
+        manager: req.user.position === "manager" ? true : false,
         image: "/" + user.image,
         active: { user: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -90,6 +93,7 @@ exports.getWorkingHourStatistic = async (req, res, next) => {
         res.render("workingHourStatistic", {
           pageTitle: "Thông tin giờ làm",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           workingHourStatistic: statistic
             .filter((x) => x.totalHour >= 0)
             .slice(
@@ -113,6 +117,7 @@ exports.getWorkingHourStatistic = async (req, res, next) => {
         res.render("workingHourStatistic", {
           pageTitle: "Thông tin giờ làm",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           workingHourStatistic: statistic,
           totalWorkingDays: totalWorkingDays,
           active: { record: true },
@@ -145,6 +150,7 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
         res.render("workingHourStatistic", {
           pageTitle: "Tra cứu thông tin giờ làm",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           workingHourStatistic: currStatistic
             .filter((x) => x.totalHour >= 0)
             .slice(
@@ -170,6 +176,7 @@ exports.getWorkingHourStatisticSearch = function (req, res, next) {
         res.render("workingHourStatistic", {
           pageTitle: "Tra cứu thông tin giờ làm",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           workingHourStatistic: currStatistic,
           searchFromDate: searchFromDate,
           searchToDate: searchToDate,
@@ -256,6 +263,7 @@ exports.getSalaryStatistic = (req, res, next) => {
         res.render("salaryStatistic", {
           pageTitle: "Thông tin bảng lương",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           salaryStatistic: salaryStatistic.slice(
             ITEMS_PER_PAGE * (page - 1),
             ITEMS_PER_PAGE * (page - 1) + ITEMS_PER_PAGE
@@ -274,6 +282,7 @@ exports.getSalaryStatistic = (req, res, next) => {
         res.render("salaryStatistic", {
           pageTitle: "Thông tin bảng lương",
           user: req.session.user,
+          manager: req.user.position === "manager" ? true : false,
           salaryStatistic: salaryStatistic,
           active: { record: true },
           isAuthenticated: req.session.isLoggedIn,
@@ -363,6 +372,7 @@ exports.getSalaryStatisticSearch = function (req, res, next) {
       res.render("salaryStatistic", {
         pageTitle: "Thông tin bảng lương",
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
         salaryStatistic: currStatistic,
         searchMonth: `${
           searchMonth.getUTCMonth() + 1

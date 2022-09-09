@@ -66,10 +66,14 @@ exports.postAbsence = (req, res, next) => {
       .catch((err) => console.log(err));
 
     // Update số ngày nghỉ còn lại
-    User.updateOne({ annualLeave: daysRemain }, function (err, res) {
-      if (err) throw err;
-      console.log(res);
-    });
+    User.findByIdAndUpdate(
+      req.user._id,
+      { annualLeave: daysRemain },
+      function (err, res) {
+        if (err) throw err;
+        console.log(res);
+      }
+    );
   } else {
     res.render("absence", {
       pageTitle: "Đăng ký nghỉ",

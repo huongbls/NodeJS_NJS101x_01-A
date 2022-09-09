@@ -29,7 +29,6 @@
               check-in/out</a>
             <a href="/absence" class="dropdown-item">Take leave</a>
             <a href="/absence-details" class="dropdown-item">Detail take leave</a>
-
           </div>
         </li>
         <li class="navbar-item dropdown {{#if active.record}}active{{/if}}">
@@ -47,6 +46,11 @@
         <li class="nav-item {{#if active.covid}}active{{/if}}">
           <a href="/covid" class="nav-link">Covid-19</a>
         </li>
+        {{#if manager}}
+        <li class="nav-item {{#if active.approve}}active{{/if}}">
+          <a href="/approveTimesheet" class="nav-link">Approve</a>
+        </li>
+        {{/if}}
         <li class="navbar-item dropdown">
           <a
             href="#"

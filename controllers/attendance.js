@@ -26,6 +26,7 @@ exports.getAttendace = (req, res, next) => {
         user: req.session.user,
         isWorking: req.user.isWorking,
         userName: req.user.name,
+        manager: req.user.position === "manager" ? true : false,
         date: new Date(),
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -98,6 +99,7 @@ exports.getAttendanceDetails = (req, res, next) => {
       res.render("attendance-details", {
         pageTitle: "Chi tiết công việc",
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
         attendance: attendance,
         totalWorkingHour: totalWorkingHour,
         active: { timesheet: true },

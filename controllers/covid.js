@@ -6,7 +6,7 @@ const PDFDocument = require("pdfkit");
 
 // Get Covid Page
 exports.getCovid = (req, res, next) => {
-  Covid.findOne({ userId: req.session.user._id })
+  Covid.findOne({ userId: req.user._id })
     .lean()
     .then((covid) => {
       if (!covid) {
@@ -37,7 +37,7 @@ exports.getCovid = (req, res, next) => {
 exports.postCovid = (req, res, next) => {
   const type = req.query.type;
   console.log(req.body.temperature);
-  Covid.findOne({ userId: req.session.user._id })
+  Covid.findOne({ userId: req.user._id })
     .then((covid) => {
       if (type === "temperature") {
         covid.bodyTemperatures.push({
@@ -64,7 +64,7 @@ exports.postCovid = (req, res, next) => {
 
 // Get Covid Details Page
 exports.getCovidDetails = (req, res, next) => {
-  Covid.findOne({ userId: req.session.user._id })
+  Covid.findOne({ userId: req.user._id })
     .lean()
     .then((covid) => {
       if (covid) {
@@ -83,6 +83,7 @@ exports.getCovidDetails = (req, res, next) => {
       res.render(`covid-details`, {
         pageTitle: "Thông tin Covid",
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
         covid: covid,
         active: { covid: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -116,9 +117,10 @@ exports.getCovidDetailsStaffs = async (req, res, next) => {
     });
   });
   console.log(covidStaffInfor);
-  res.render("covid-details-staffs", {
+  res.render("manager/covid-details-staffs", {
     pageTitle: "Thông tin Covid",
     user: req.session.user,
+    manager: req.user.position === "manager" ? true : false,
     department: deptMembers[0].department,
     covid: covidStaffInfor,
     active: { covid: true },
@@ -132,13 +134,22 @@ exports.getPDF = async (req, res, next) => {
     department: req.user.department,
   }).lean();
   const covidResult = await Covid.find().lean();
-  const pdfName = "thongtincovid.pdf";
+  const date = new Date().toISOString().slice(0, 10);
+  const pdfName =
+    date + " Thong-tin-covid-phong-" + deptMembers[0].department + ".pdf";
   const pdfPath = path.join("data", "covid", pdfName);
   const file = fs.createWriteStream(pdfPath);
   const pdfDoc = new PDFDocument();
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", "inline; filename=" + pdfName);
+
   pdfDoc.registerFont(
     "Roboto",
-    "../public/assets/fonts/RobotoCondensed-Light.ttf"
+    "public/assets/fonts/RobotoCondensed-Light.ttf"
+  );
+  pdfDoc.registerFont(
+    "Roboto-Bold",
+    "public/assets/fonts/RobotoCondensed-Bold.ttf"
   );
 
   deptMembers.forEach((member) => {
@@ -163,43 +174,41 @@ exports.getPDF = async (req, res, next) => {
   pdfDoc.pipe(file);
   pdfDoc.pipe(res);
   pdfDoc
-    .fontSize(26)
+    .fontSize(20)
     .font("Roboto")
     .text("Thông tin Covid phòng " + req.user.department);
-  pdfDoc.fontSize(12).text("  ");
   covidStaffInfor.forEach((data) => {
-    pdfDoc.font("Roboto").text("Họ và tên: " + data.name);
-    pdfDoc.text("Nhiet do co the");
+    pdfDoc.fontSize(12).text("  ");
+    pdfDoc.font("Roboto-Bold").text("Họ và tên: " + data.name);
+    pdfDoc.font("Roboto").text("Nhiệt độ cơ thể");
     data.bodyTemperatures.forEach((temp) => {
       pdfDoc.text(
-        "     Ngay: " +
+        "     Ngày: " +
           temp.date.toLocaleDateString() +
-          "     Nhiet do: " +
+          "     Nhiệt độ: " +
           temp.value +
           " oC"
       );
     });
-    pdfDoc.text("Tiem vacxin");
+    pdfDoc.text("Tiêm vắcxin");
     data.vaccine.forEach((vaccine) => {
       pdfDoc.text(
-        "     Ngay: " +
+        "     Ngày: " +
           vaccine.date.toLocaleDateString() +
-          "     Mui " +
+          "     Mũi " +
           vaccine.injectedNo +
           " - " +
           vaccine.name
       );
     });
-    pdfDoc.text("Duong tinh covid");
+    pdfDoc.text("Dương tính Covid");
     data.positive.forEach((positive) => {
       pdfDoc.text(
-        "     Ngay: " +
+        "     Ngày: " +
           positive.date.toLocaleDateString() +
-          "     Duong tinh Covid"
+          "     Dương tính Covid"
       );
     });
-    pdfDoc.fontSize(12).text("  ");
   });
-  // pdfDoc.text("---------------");
   pdfDoc.end();
 };

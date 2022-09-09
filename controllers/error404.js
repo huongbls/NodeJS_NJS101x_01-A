@@ -4,6 +4,7 @@ exports.getError = (req, res, next) => {
     res.render("error404", {
       pageTitle: "Không tìm thấy trang",
       user: req.session.user,
+      manager: req.user.position === "manager" ? true : false,
     });
   } else {
     res.redirect("/login");

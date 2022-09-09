@@ -5,6 +5,7 @@ exports.getAddEmployee = (req, res, next) => {
     pageTitle: "Thêm nhân viên",
     isAuthenticated: req.session.isLoggedIn,
     user: req.session.user,
+    manager: req.user.position === "manager" ? true : false,
   });
 };
 
@@ -63,6 +64,7 @@ exports.getEditEmployee = (req, res, next) => {
         editing: editMode,
         employee: employee,
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
       });
     })
     .catch((err) => console.log(err));
@@ -113,6 +115,7 @@ exports.getEmployees = (req, res, next) => {
         pageTitle: "Danh sách nhân viên",
         isAuthenticated: req.session.isLoggedIn,
         user: req.session.user,
+        manager: req.user.position === "manager" ? true : false,
       });
     })
     .catch((err) => {

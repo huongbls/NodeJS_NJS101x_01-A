@@ -4,6 +4,7 @@ const covidController = require("../controllers/covid");
 const absenceController = require("../controllers/absence");
 const attendanceController = require("../controllers/attendance");
 const authController = require("../controllers/auth");
+const managerController = require("../controllers/manager");
 const isAuth = require("../middleware/is-auth");
 const isManager = require("../middleware/is-manager");
 const router = express.Router();
@@ -49,13 +50,13 @@ router.post("/attendance", attendanceController.postAttendance);
 
 // Absence Page
 router.get("/absence", isAuth, absenceController.getAbsence);
-router.get("/absence-details", absenceController.getAbsenceDetails);
+router.get("/absence-details", isAuth, absenceController.getAbsenceDetails);
 router.post("/absence", absenceController.postAbsence);
 
 // Covid Page
 router.get("/covid", isAuth, covidController.getCovid);
 router.get("/covid-details", isAuth, covidController.getCovidDetails);
-router.post("/covid-details-staffs", covidController.postCovid);
+router.post("/covid", covidController.postCovid);
 router.get(
   "/covid-details-staffs",
   isAuth,
@@ -63,10 +64,23 @@ router.get(
   covidController.getCovidDetailsStaffs
 );
 router.get(
-  "/covid-details-staffs/pdf",
+  "/covid-details-staffs/thong-tin-covid.pdf",
   isAuth,
   isManager,
   covidController.getPDF
+);
+
+router.get(
+  "/approveTimesheet",
+  isAuth,
+  isManager,
+  managerController.getApproveTimesheet
+);
+router.get(
+  "/approveTimesheet-search",
+  isAuth,
+  isManager,
+  managerController.getApproveTimesheetSearch
 );
 
 module.exports = router;
