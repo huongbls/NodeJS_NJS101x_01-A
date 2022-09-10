@@ -1,6 +1,6 @@
 const User = require("../models/user");
-const Attendance = require("../models/attendance");
 const Absence = require("../models/absence");
+const Attendance = require("../models/attendance");
 
 exports.getApproveTimesheet = async (req, res, next) => {
   const month = new Date().toISOString().slice(0, 7);
@@ -9,7 +9,7 @@ exports.getApproveTimesheet = async (req, res, next) => {
     position: "staff",
   }).lean();
 
-  res.render("manager/approveTimesheet", {
+  res.render("manager/approve-timesheet", {
     active: { approve: true },
     member: deptMembers,
     month: month,
@@ -47,7 +47,7 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
             staffTimesheet.push(x);
           }
         });
-        res.render("manager/approveTimesheet", {
+        res.render("manager/approve-timesheet", {
           member: deptMembers,
           user: req.session.user,
           searchMonth: searchMonth,
@@ -60,6 +60,26 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
       });
     }
   });
+};
 
-  console.log(staffTimesheet);
+exports.postApproveTimesheet = (req, res, next) => {
+  const confirmed = req.query.confirmed;
+  Attendance.findOneAndUpdate()
+    .then()
+    .catch((err) => console.log(err));
+  Absence.findByIdAndUpdate()
+    .then()
+    .catch((err) => console.log(err));
+  if (confirmed === "yes") {
+    res.redirect("/confirmed-timesheet");
+  }
+};
+
+exports.getConfirmedApproveTimesheet = async (req, res, next) => {
+  res.render("manager/confirmed-timesheet", {
+    active: { approve: true },
+    user: req.session.user,
+    isAuthenticated: req.session.isLoggedIn,
+    manager: req.user.position === "manager" ? true : false,
+  });
 };

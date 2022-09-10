@@ -20,6 +20,7 @@ exports.getAbsence = (req, res, next) => {
         pageTitle: "Đăng ký nghỉ",
         user: req.session.user,
         annualLeave: req.user.annualLeave,
+        manager: req.user.position === "manager" ? true : false,
         absence: absence,
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
@@ -84,6 +85,7 @@ exports.postAbsence = (req, res, next) => {
       toHour: req.body.toHour,
       reason: req.body.reason,
       annualLeave: req.user.annualLeave,
+      manager: req.user.position === "manager" ? true : false,
       active: { timesheet: true },
       isAuthenticated: req.session.isLoggedIn,
       errMessage:
@@ -105,6 +107,7 @@ exports.getAbsenceDetails = (req, res, next) => {
         user: req.session.user,
         absence: absence,
         annualLeave: req.user.annualLeave,
+        manager: req.user.position === "manager" ? true : false,
         active: { timesheet: true },
         isAuthenticated: req.session.isLoggedIn,
       });

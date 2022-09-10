@@ -12,12 +12,12 @@ const absenceSchema = new Schema({
       fromDate: {
         type: Date,
         required: true,
-        unique: true,
+        // unique: true,
       },
       toDate: {
         type: Date,
         required: true,
-        unique: true,
+        // unique: true,
       },
       hours: {
         type: Number,
@@ -34,6 +34,9 @@ const absenceSchema = new Schema({
       reason: {
         type: String,
         required: true,
+      },
+      isConfirmed: {
+        type: String,
       },
     },
   ],

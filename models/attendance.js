@@ -18,6 +18,7 @@ const attendanceSchema = new Schema({
       workplace: { type: String, required: true },
     },
   ],
+  isComfirmed: { type: String },
 });
 
 // Tạo statics thiết lập mảng các tháng đã làm từ ngày vào công ty đến hiện tại

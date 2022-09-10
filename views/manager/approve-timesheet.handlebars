@@ -1,0 +1,109 @@
+<div class="container">
+  <h4>Phê duyệt bảng chấm công</h4>
+  <a href="/confirmed-timesheet">Xem chi tiết phê duyệt</a>
+  <form action="/approve-timesheet-search" method="GET">
+    <div class="row">
+      <div
+        class="form-group col-sm-12 col-md-4 col-lg-3 offset-md-2 offset-lg-2"
+      >
+        <label for="searchMonth">Chọn tháng</label>
+        {{#if searchMonth}}
+          <input
+            type="month"
+            class="form-control"
+            name="searchMonth"
+            value="{{searchMonth}}"
+          />
+        {{else}}
+          <input type="month" class="form-control" name="searchMonth" />
+        {{/if}}
+      </div>
+      <div class="form-group col-sm-12 col-md-4 col-lg-3">
+        <label for="searchEmployee">Chọn nhân viên</label>
+        <select class="form-control" name="searchEmployee">
+          <option selected="true" disabled="disable">Chọn nhân viên</option>
+          {{#each member}}
+            <option>{{name}}</option>
+          {{/each}}
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div
+        class="form-group col-sm-2 col-md-1 col-lg-1 offset-md-2 offset-lg-2"
+      >
+        <button type="submit" class="btn btn-secondary">Tra cứu</button>
+      </div>
+    </div>
+  </form>
+  {{#if staffTimesheet}}
+  {{#unless searchEmployee}}
+  <p style="color:red">Bạn chưa chọn nhân viên</p>
+  {{/unless}}
+  {{#unless searchMonth}}
+  {{/unless}}
+    <p>Bảng chấm công {{searchEmployee}} - {{searchMonth}}</p>
+    <table class="table table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Ngày</th>
+          <th>Nơi làm</th>
+          <th>Giờ bắt đầu</th>
+          <th>Giờ kết thúc</th>
+          <th>Thời gian làm (hr)</th>
+          <th>Nghỉ phép (hr)</th>
+          <th>Tổng giờ làm (hr)(*)</th>
+          <th>Overtime (hr)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each staffTimesheet}}
+          {{#if details}}
+            {{#each details}}
+              <tr>
+                {{#ifCond @index '===' 0}}
+                <td rowspan="{{../details.length}}">{{tolocaledatestring ../date}}</td>
+                {{/ifCond}}
+                <td>{{workplace}}</td>
+                <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
+                {{#if endTime}}
+                  <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+                  <td>{{subStract endTime startTime}}</td>
+                {{else}}
+                  <td>-</td>
+                  <td>-</td>
+                {{/if}}
+                {{#ifCond @index '===' 0}} 
+                {{#if ../leaveHour}}
+                <td rowspan="{{../details.length}}">{{../leaveHour}}</td>
+                <td rowspan="{{../details.length}}">{{../totalHour}}</td>
+                {{else}}
+                <td rowspan="{{../details.length}}">-</td>
+                <td rowspan="{{../details.length}}">{{../totalWorkingHour}}</td>
+                {{/if}}
+                <td rowspan="{{../details.length}}">{{../overTime}}</td>
+                {{/ifCond}}
+              </tr>
+            {{/each}}
+          {{else}}
+            {{#if leaveHour}}
+              <tr>
+                <td>{{tolocaledatestring date}}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{leaveHour}}</td>
+                <td>{{totalHour}}</td>
+                <td>-</td>
+              </tr>
+            {{/if}}
+          {{/if}}
+        {{/each}}
+      </tbody>
+    </table>
+    <form action="/approve-timesheet-search?searchMonth={{searchMonth}}&searchEmployee={{searchEmployee}}&confirmed=yes" method="POST">
+        <button class="btn btn-primary">Xác nhận</button>
+    </form>
+  {{/if}}
+</div>

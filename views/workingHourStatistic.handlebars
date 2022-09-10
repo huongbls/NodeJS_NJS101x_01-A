@@ -107,6 +107,14 @@
           <a href="?rowNum=30{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='30}}active{{/ifCond}}">Hiển thị 30</a>
           <a href="?rowNum=40{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='40}}active{{/ifCond}}">Hiển thị 40</a>
         </div>
+        <div>
+          <select name="rowNum">
+            <option {{#ifCond ITEMS_PER_PAGE '==='10}}selected{{/ifCond}}>10</option>
+            <option {{#ifCond ITEMS_PER_PAGE '==='20}}selected{{/ifCond}}>20</option>
+            <option {{#ifCond ITEMS_PER_PAGE '==='30}}selected{{/ifCond}}>30</option>
+            <option {{#ifCond ITEMS_PER_PAGE '==='40}}selected{{/ifCond}}>40</option>
+          </select>
+        </div>
         </section>
     {{else}}
       <p class="mt-5">Bạn chưa có thông tin giờ làm.</p>

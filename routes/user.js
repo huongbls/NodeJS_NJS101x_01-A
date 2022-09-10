@@ -71,16 +71,26 @@ router.get(
 );
 
 router.get(
-  "/approveTimesheet",
+  "/approve-timesheet",
   isAuth,
   isManager,
   managerController.getApproveTimesheet
 );
 router.get(
-  "/approveTimesheet-search",
+  "/approve-timesheet-search",
   isAuth,
   isManager,
   managerController.getApproveTimesheetSearch
+);
+router.get(
+  "/confirmed-timesheet",
+  isAuth,
+  isManager,
+  managerController.getConfirmedApproveTimesheet
+);
+router.post(
+  "/approve-timesheet-search",
+  managerController.postApproveTimesheet
 );
 
 module.exports = router;
