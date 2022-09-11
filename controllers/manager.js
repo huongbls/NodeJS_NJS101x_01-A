@@ -34,31 +34,38 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
   );
 
   deptMembers.forEach((member) => {
+    staffTimesheet.push({
+      name: member.name,
+      _id: member._id,
+    });
+  });
+
+  deptMembers.forEach((member) => {
     let workingRecord = [];
     const user = new User(member);
     user.getStatistic().then((statistic) => {
-      statistic.forEach((x) => {
-        if (x.date >= firstDayOfMonth && x.date <= lastDayOfMonth) {
-          workingRecord.push(x);
-        }
-        staffTimesheet.push({
-          _id: member._id,
-          name: member.name,
-          workingRecord: workingRecord,
+      staffTimesheet.forEach((object) => {
+        statistic.forEach((x) => {
+          if (object._id.toString() === member._id.toString()) {
+            if (x.date >= firstDayOfMonth && x.date <= lastDayOfMonth) {
+              workingRecord.push(x);
+            }
+            Object.assign(object, { workingRecord: workingRecord });
+          }
         });
       });
-      console.log(staffTimesheet);
-      res.render("manager/approve-timesheet", {
-        member: deptMembers,
-        user: req.session.user,
-        searchMonth: searchMonth,
-        staffTimesheet: staffTimesheet,
-        active: { approve: true },
-        isAuthenticated: req.session.isLoggedIn,
-        manager: req.user.position === "manager" ? true : false,
-      });
+      return staffTimesheet;
     });
-    // console.log(staffTimesheet);
+  });
+
+  res.render("manager/approve-timesheet", {
+    member: deptMembers,
+    user: req.session.user,
+    searchMonth: searchMonth,
+    staffTimesheet: staffTimesheet,
+    active: { approve: true },
+    isAuthenticated: req.session.isLoggedIn,
+    manager: req.user.position === "manager" ? true : false,
   });
 };
 
