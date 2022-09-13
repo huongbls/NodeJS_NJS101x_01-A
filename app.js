@@ -168,7 +168,7 @@ dbConnect()
           });
           user.save();
         }
-        app.listen(process.env.PORT || 3333, "0.0.0.0", () => {
+        app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
           console.log("Server đã khởi động tại port 3333");
         });
       })
