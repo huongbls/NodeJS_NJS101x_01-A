@@ -1,0 +1,98 @@
+<div class="nav navbar navbar-expand-sm bg-primary navbar-dark mb-3">
+  <div class="container">
+
+    <!-- Collapsible -->
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-toggle="collapse"
+      data-target="#collapsiblenavbar"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Navbar chinh thuc -->
+    <div class="collapse navbar-collapse" id="collapsiblenavbar">
+    {{#if isAuthenticated}}
+      <ul class="navbar-nav">
+        <li class="nav-item {{#if active.home}}active{{/if}}" >
+          <a href="/" class="nav-link">Trang chủ</a>
+        </li>
+        <li class="navbar-item dropdown {{#if active.timesheet}}active{{/if}}">
+          <a
+            href="#"
+            class="nav-link dropdown-toggle"
+            data-toggle="dropdown"
+          >Timesheet</a>
+          <div class="dropdown-menu">
+            <a href="/attendance" class="dropdown-item">Check-in/out</a>
+            <a href="/attendance-details" class="dropdown-item">Details
+              check-in/out</a>
+            <a href="/absence" class="dropdown-item">Take leave</a>
+            <a href="/absence-details" class="dropdown-item">Detail take leave</a>
+          </div>
+        </li>
+        <li class="navbar-item dropdown {{#if active.record}}active{{/if}}">
+          <a
+            href="#"
+            class="nav-link dropdown-toggle"
+            data-toggle="dropdown"
+          >Record</a>
+          <div class="dropdown-menu">
+            <a href="/workingHourStatistic" class="dropdown-item">Working hour
+              Summary</a>
+            <a href="/salaryStatistic" class="dropdown-item">Salary Summary</a>
+          </div>
+        </li>
+        <li class="nav-item {{#if active.covid}}active{{/if}}">
+          <a href="/covid" class="nav-link">Covid-19</a>
+        </li>
+        {{#if manager}}
+        <li class="nav-item {{#if active.approve}}active{{/if}}">
+          <a href="/approve-timesheet" class="nav-link">Approve</a>
+        </li>
+        {{/if}}
+        {{#if admin}}
+        <li class="navbar-item dropdown {{#if active.admin}}active{{/if}}">
+          <a
+            href="#"
+            class="nav-link dropdown-toggle"
+            data-toggle="dropdown"
+          >Admin</a>
+          <div class="dropdown-menu">
+            <a href="/admin/employees" class="dropdown-item">Danh sách nhân viên</a>
+            <a href="/admin/add-employee" class="dropdown-item">Thêm nhân viên</a>
+          </div>
+        </li>
+        {{/if}}
+        <li class="nav-item {{#if active.about}}active{{/if}}">
+          <a href="/about" class="nav-link">About</a>
+        </li>
+      </ul>
+    {{/if}}
+      <ul class="navbar-nav ml-auto">
+            {{#if isAuthenticated}}
+              <li class="navbar-item dropdown {{#if active.user}}active{{/if}}">
+                <a
+                  href="#"
+                  class="nav-link dropdown-toggle"
+                  data-toggle="dropdown"
+                >User</a>
+              {{/if}}
+          <div class="dropdown-menu">
+            <a href="/edit-user/{{user._id}}" class="dropdown-item">Chỉnh sửa
+              profile</a>
+            <form action="/logout" method="post">
+            <button type="submit" class="btn btn-link dropdown-item">Logout</button>
+            </form>
+          </div>
+        </li>
+        {{#if isAuthenticated}}
+        {{else}}
+        <li class="nav-item">
+          <a href="/login" class="nav-link active" >Login</a>
+        </li>
+        {{/if}}
+      </ul>
+    </div>
+  </div>
+</div>

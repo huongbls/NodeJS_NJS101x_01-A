@@ -1,0 +1,65 @@
+<div class="container">
+  <h4>{{user.name}}</h4>
+  <a href="/covid">Đăng ký thông tin covid</a>
+  <h6 class="mt-3">Thông tin thân nhiệt</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Ngày</th>
+        <th>Giờ</th>
+        <th>Nhiệt độ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid.bodyTemperatures}}
+        <tr>
+          <td>{{tolocaledatestring date}}</td>
+          <td>{{getHours date}}:{{getMinutes date}}</td>
+          <td>{{value}}<sup>o</sup>C</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+  <h6 class="mt-3">Thông tin tiêm vắcxin</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Ngày</th>
+        <th>Mũi</th>
+        <th>Tên vắcxin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid.vaccine}}
+        <tr>
+          <td>{{tolocaledatestring date}}</td>
+          <td>Mũi {{injectedNo}}</td>
+          <td>{{name}}</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+  <h6 class="mt-3">Thông tin dương tính covid</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Ngày</th>
+        <th>Kết quả</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid.positive}}
+        <tr>
+          <td>{{tolocaledatestring date}}</td>
+          <td>Dương tính covid</td>
+        </tr>
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+</div>

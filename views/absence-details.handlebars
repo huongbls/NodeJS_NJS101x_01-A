@@ -1,0 +1,32 @@
+<div class="container">
+  <h4>Chi tiết đăng ký nghỉ</h4>
+  <p><a href="/absence">Quay lại</a></p>
+  {{#if absence.registerLeave}}
+    <table class="table">
+      <thead class="thead-light">
+        <tr>
+          <th>Nghỉ từ ngày</th>
+          <th>Đến ngày</th>
+          <th>Số giờ nghỉ</th>
+          <th>Số ngày nghỉ</th>
+          <th>Lý do</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each absence.registerLeave}}
+          <tr>
+            <td>{{tolocaledatestring fromDate}}</td>
+            <td>{{tolocaledatestring toDate}}</td>
+            <td>{{hours}}</td>
+            <td>{{convertLeaveHourtoDay hours}}</td>
+            <td>{{reason}}</td>
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <hr />
+  {{else}}
+    <p class="mt-4">Bạn chưa đăng ký nghỉ</p>
+  {{/if}}
+  <p>Số ngày nghỉ còn lại: {{annualLeave}}</p>
+</div>

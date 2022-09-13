@@ -1,0 +1,89 @@
+<div class="card-deck mt-3">
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      {{#unless isWorking}}
+        <h4 class="card-text mb-3">Điểm danh bắt đầu</h4>
+        {{#ifCond isLocked "===" "true"}}
+          <p style="color:red;">Bạn đang bị khóa chức năng này.</p>
+        {{else}}
+          <form action="/attendance?type=start" method="POST">
+            <div class="form-group">
+              <label for="name">Họ và tên</label>
+              <input
+                type="text"
+                class="form-control"
+                name="name"
+                value="{{userName}}"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label for="date">Ngày</label>
+              <input
+                type="text"
+                class="form-control"
+                name="date"
+                value="{{tolocaledatestring date}}"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label for="date">Giờ</label>
+              <input
+                type="text"
+                class="form-control"
+                name="time"
+                value="{{getHours date}}:{{getMinutes date}}"
+                disabled
+              />
+            </div>
+            <div class="form-group">
+              <label for="workplace">Nơi làm việc</label>
+              <select name="workplace" class="form-control" required>
+                <option value="Công ty">Công Ty</option>
+                <option value="Nhà">Nhà</option>
+                <option value="Khách Hàng">Khách Hàng</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-secondary">Check-in</button>
+          </form>
+        {{/ifCond}}
+      {{else}}
+        <h4 class="card-text mb-3">Kết thúc làm</h4>
+        <form action="/attendance?type=stop" method="POST">
+          <div class="form-group">
+            <label for="date">Ngày</label>
+            <input
+              type="text"
+              class="form-control"
+              name="date"
+              value="{{tolocaledatestring date}}"
+              disabled
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Giờ</label>
+            <input
+              type="text"
+              class="form-control"
+              name="time"
+              value="{{getHours date}}:{{getMinutes date}}"
+              disabled
+            />
+          </div>
+          <button type="submit" class="btn btn-secondary">Check-out</button>
+        </form>
+      {{/unless}}
+    </div>
+  </div>
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      <h4 class="card-text mb-3">Đăng ký nghỉ phép</h4>
+      {{#ifCond isLocked "===" "true"}}
+        <p style="color:red;">Bạn đang bị khóa chức năng này.</p>
+      {{else}}
+        <a href="/absence">Link đăng ký</a>
+      {{/ifCond}}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<div class="container">
+  <h4>Thông tin Covid phòng {{department}} </h4>
+  <a href="/covid">Quay lại</a>
+  <br>
+  <a href="/covid-details-staffs/thong-tin-covid.pdf">In ra PDF</a>
+  <h6 class="mt-3">Thông tin thân nhiệt</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Họ và tên</th>
+        <th>Ngày</th>
+        <th>Giờ</th>
+        <th>Nhiệt độ</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid}}
+        {{#each bodyTemperatures}}
+          <tr>
+            {{#ifCond @index '===' 0}}
+            <td rowspan="{{../bodyTemperatures.length}}">{{../name}}</td>
+            {{/ifCond}}
+            <td>{{tolocaledatestring date}}</td>
+            <td>{{getHours date}}:{{getMinutes date}}</td>
+            <td>{{value}}<sup>o</sup>C</td>
+          </tr>
+        {{/each}}
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+  <h6 class="mt-3">Thông tin tiêm vắcxin</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Họ và tên</th>
+        <th>Ngày</th>
+        <th>Mũi</th>
+        <th>Tên vắcxin</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid}}
+      {{#each vaccine}}
+        <tr>
+          {{#ifCond @index '===' 0}}
+          <td rowspan="{{../vaccine.length}}">{{../name}}</td>
+          {{/ifCond}}
+          <td>{{tolocaledatestring date}}</td>  
+          <td>Mũi {{injectedNo}}</td>
+          <td>{{name}}</td>
+        </tr>
+      {{/each}}
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+  <h6 class="mt-3">Thông tin dương tính covid</h6>
+  <table class="table">
+    <thead class="thead-light">
+      <tr>
+        <th>Họ và tên</th>
+        <th>Ngày</th>
+        <th>Kết quả</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each covid}}
+      {{#each positive}}
+        <tr>
+          {{#ifCond @index '===' 0}}
+          <td rowspan="{{../positive.length}}">{{../name}}</td>
+          {{/ifCond}}
+          <td>{{tolocaledatestring date}}</td>
+          <td>Dương tính covid</td>
+        </tr>
+      {{/each}}     
+      {{/each}}
+    </tbody>
+  </table>
+  <hr />
+  <br />
+</div>

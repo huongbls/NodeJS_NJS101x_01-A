@@ -1,0 +1,77 @@
+<div class="container">
+  <h4>Thông tin bảng lương</h4>
+  <a class="mt-3" href="/workingHourStatistic">Thông tin giờ làm</a>
+  <div class="float-right mb-3">
+    <form action="/salaryStatistic-search" method="GET">
+      <label for="searchMonth">Chọn tháng</label>
+      <input type="month" name="searchMonth" value="{{#if searchMonth}}{{month}}{{/if}}"/>
+      <button type="submit">Tra cứu</button>
+    </form>
+  </div>
+  {{#if salaryStatistic}}
+    <table class="table table-bordered">
+      <thead class="thead-light">
+        <tr>
+          <th>Tháng</th>
+          <th>Tổng giờ làm</th>
+          <th>Tổng giờ OT</th>
+          <th>Giờ làm thiếu (Ngày)</th>
+          <th>Tiền lương</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each salaryStatistic}}
+          <tr>
+            <td>{{month}}</td>
+            <td>{{totalHour}}</td>
+            <td>{{overTime}}</td>
+            <td>{{missingHour}} hr - ({{missingDay}} ngày)</td>
+            {{#if totalHour}}
+              <td>{{totalSalary}}</td>
+            {{else}}
+              <td>0</td>
+            {{/if}}
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    {{#if searchMonth}}
+      <p class="mt-3">
+        <a href="/salaryStatistic">Quay lại Thông tin bảng lương</a>
+      </p>
+    {{else}}
+      <section class="pagination">
+        <div class="float-left">
+        {{#ifCond currentPage '!==' 1}}
+          {{#ifCond previousPage '!==' 1}}
+            <a href="?page=1&monthNum={{ITEMS_PER_PAGE}}">1</a>
+          {{/ifCond}}
+        {{/ifCond}}
+        {{#if hasPreviousPage}}
+          <a href="?page={{previousPage}}&monthNum={{ITEMS_PER_PAGE}}">{{previousPage}}</a>
+        {{/if}}
+          <a href="?page={{currentPage}}&monthNum={{ITEMS_PER_PAGE}}" class="active">{{currentPage}}</a>
+        {{#if hasNextPage}}
+          <a href="?page={{nextPage}}&monthNum={{ITEMS_PER_PAGE}}">{{nextPage}}</a>
+        {{/if}}
+        {{#ifCond lastPage '!==' currentPage}}
+        {{#ifCond nextPage '!==' lastPage}}
+          <a href="?page={{lastPage}}&monthNum={{ITEMS_PER_PAGE}}">{{lastPage}}</a>
+        {{/ifCond}}
+        {{/ifCond}}
+          <a href="?monthNum=12" class="{{#ifCond ITEMS_PER_PAGE '==='12}}active{{/ifCond}}">Hiển thị 12</a>
+          <a href="?monthNum=24" class="{{#ifCond ITEMS_PER_PAGE '==='24}}active{{/ifCond}}">Hiển thị 24</a>
+        </div>
+        </section>
+            {{/if}}
+  {{else}}
+    {{#ifCond searchMonth "!==" "NaN/NaN"}}
+      <p class="mt-5">Không có thông tin bảng lương tháng
+        {{searchMonth}}.
+      </p>
+    {{else}}
+      <p class="mt-5">Bạn chưa chọn tháng để tra cứu.
+      </p>
+    {{/ifCond}}
+  {{/if}}
+</div>

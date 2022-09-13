@@ -1,0 +1,21 @@
+{{#unless isWorking}}
+  {{#if userName}}
+    <div class="jumbotron">
+      <h4 class="title">{{userName}} đang không làm việc</h4>
+      <p>Chúc bạn một ngày tốt lành !!!</p>
+      <img
+        src="assets\image\Have-a-nice-day.png"
+        alt="you are not working"
+        width="30%"
+      />
+    </div>
+  {{/if}}
+{{else}}
+  {{#if userName}}
+    <div class="jumbotron">
+      <h4 class="title">{{userName}} đang làm việc tại {{workplace}}</h4>
+      <p>Chúc bạn một ngày làm việc hiệu quả !!!</p>
+      <img src="assets\image\Working.png" alt="you are working" />
+    </div>
+  {{/if}}
+{{/unless}}

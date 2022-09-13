@@ -1,0 +1,38 @@
+<div class="container">
+  <h4>Thông tin giờ làm, nơi làm</h4>
+  <a href="/attendance">Quay lại</a>
+  {{#if attendance.details}}
+    <table class="table mt-3">
+      <thead class="thead-light">
+        <tr>
+          <th>Ngày</th>
+          <th>Nơi làm</th>
+          <th>Giờ bắt đầu</th>
+          <th>Giờ kết thúc</th>
+          <th>Thời gian làm</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each attendance.details}}
+          <tr>
+            <td>{{tolocaledatestring startTime}}</td>
+            <td>{{workplace}}</td>
+            <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
+            {{#if endTime}}
+              <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+              <td>{{subStract endTime startTime}}</td>
+            {{else}}
+              <td>-</td>
+              <td>-</td>
+            {{/if}}
+          </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    <hr />
+    <br />
+    <h6>Tổng giờ đã làm hôm nay: {{totalWorkingHour}} hrs</h6>
+  {{else}}
+    <p class="mt-4">Chưa có thông tin giờ làm ngày hôm nay</p>
+  {{/if}}
+</div>

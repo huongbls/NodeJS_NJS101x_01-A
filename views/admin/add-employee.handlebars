@@ -1,0 +1,205 @@
+<div class="card-deck mt-3">
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      {{#if editing}}
+        <h4 class="card-text">Thay đổi thông tin nhân viên</h4>
+        <p class="mb-3"><a href="/admin/employees">Danh sách nhân viên</a></p>
+        <form action="/admin/edit-employee?id={{employee._id}}" method="POST">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="name">Họ và tên</label>
+              <input
+                {{!-- required --}}
+                type="text"
+                class="form-control"
+                name="name"
+                value="{{employee.name}}"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="dob">Ngày sinh</label>
+              <input
+                required
+                type="date"
+                class="form-control"
+                name="dob"
+                value="{{dob}}"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="department">Phòng ban</label>
+              <select
+                class="form-control"
+                name="department"
+              >
+                <option selected="true" disabled="disabled">Chọn phòng ban</option>
+                <option value="HR" {{#ifCond department '===' "HR"}}selected="true"{{/ifCond}}>HR</option>
+                <option value="GA" {{#ifCond department '===' "GA"}}selected="true"{{/ifCond}}>GA</option>
+                <option value="IT" {{#ifCond department '===' "IT"}}selected="true"{{/ifCond}}>IT</option>
+                <option value="BD" {{#ifCond department '===' "BD"}}selected="true"{{/ifCond}}>BD</option>
+                <option value="Kế toán" {{#ifCond department '===' "Kế toán"}}selected="true"{{/ifCond}}>Kế toán</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="position">Chức vụ</label>
+              <select class="form-control" name="position">
+                <option selected="true" disabled="disabled">Chọn chức vụ</option>
+                <option value="director" {{#ifCond position '===' "director"}}selected="true"{{/ifCond}}>Giám đốc</option>
+                <option value="manager" {{#ifCond position '===' "manager"}}selected="true"{{/ifCond}}>Trưởng phòng</option>
+                <option value="staff" {{#ifCond position '===' "staff"}}selected="true"{{/ifCond}}>Nhân viên</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="startDate">Ngày vào công ty</label>
+              <input
+                type="date"
+                class="form-control"
+                name="startDate"
+                value="{{startDate}}"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="annualLeave">Ngày nghỉ phép</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                name="annualLeave"
+                value="{{employee.annualLeave}}"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="salaryScale">Hệ số lương</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                name="salaryScale"
+                value="{{employee.salaryScale}}"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="email">Email</label>
+              <input
+                required
+                type="text"
+                class="form-control"
+                name="email"
+                value="{{employee.email}}"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="gender">Giới tính</label>
+              <select class="form-control" name="gender">
+                <option selected="true" disabled="disabled">Chọn giới tính</option>
+                <option value="Nam" {{#ifCond gender '===' "Nam"}}selected="true"{{/ifCond}}>Nam</option>
+                <option value="Nữ" {{#ifCond gender '===' "Nữ"}}selected="true"{{/ifCond}}>Nữ</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="isAdmin">Quyền admin</label>
+              <select class="form-control" name="isAdmin">
+                <option value="No" {{#ifCond isAdmin '===' "No"}}selected="true"{{/ifCond}}>No</option>
+                <option value="Yes" {{#ifCond isAdmin '===' "Yes"}}selected="true"{{/ifCond}}>Yes</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2">Cập nhập thông tin</button>
+        </form>
+      {{else}}
+        <h4 class="card-text">Thêm nhân viên</h4>
+        <p class="mb-3"><a href="/admin/employees">Danh sách nhân viên</a></p>
+        <form action="/admin/add-employee" method="POST">
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="name">Họ và tên</label>
+              <input required type="text" class="form-control" name="name" />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="dob">Ngày sinh</label>
+              <input required type="date" class="form-control" name="dob" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="department">Phòng ban</label>
+              <select class="form-control" name="department">
+                <option selected="true" disabled="disabled">Chọn phòng ban</option>
+                <option value="HR">HR</option>
+                <option value="GA">GA</option>
+                <option value="IT">IT</option>
+                <option value="BD">BD</option>
+                <option value="Kế toán">Kế toán</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="position">Chức vụ</label>
+              <select class="form-control" name="position">
+                <option selected="true" disabled="disabled">Chọn chức vụ</option>
+                <option value="director">Giám đốc</option>
+                <option value="manager">Trưởng phòng</option>
+                <option value="staff">Nhân viên</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="startDate">Ngày vào công ty</label>
+              <input type="date" class="form-control" name="startDate" />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="annualLeave">Ngày nghỉ phép</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                name="annualLeave"
+              />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="salaryScale">Hệ số lương</label>
+              <input
+                required
+                type="number"
+                class="form-control"
+                name="salaryScale"
+              />
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="email">Email</label>
+              <input required type="text" class="form-control" name="email" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="gender">Giới tính</label>
+              <select class="form-control" name="gender">
+                <option selected="true" disabled="disabled">Chọn giới tính</option>
+                <option value="Nam">Nam</option>
+                <option value="Nữ">Nữ</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-12 col-md-6">
+              <label for="isAdmin">Quyền admin</label>
+              <select class="form-control" name="isAdmin">
+                <option selected="true" value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary mt-2">Thêm nhân viên</button>
+        </form>
+      {{/if}}
+    </div>
+  </div>
+</div>

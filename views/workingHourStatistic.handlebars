@@ -1,0 +1,120 @@
+<div class="container">
+  <h4>Thông tin giờ làm</h4>
+  <a class="mt-3" href="/salaryStatistic">Thông tin bảng lương</a>
+  <div class="float-right mb-3">
+    <form action="/workingHourStatistic-search" method="GET">
+      <label for="searchFromDate">Từ ngày:</label>
+      <input type="date" name="searchFromDate" value="{{#if searchFromDate}}{{searchFromDate}}{{/if}}"/>
+      <label for="searchToDate">Đến ngày:</label>
+      <input type="date" name="searchToDate" value="{{#if searchToDate}}{{searchToDate}}{{/if}}" /> 
+      <button type="submit">Tra cứu</button>
+    </form>
+  </div>
+  {{#if workingHourStatistic}}
+  {{#if totalWorkingDays}}
+      <table class="table table-bordered">
+        <thead class="thead-light">
+          <tr>
+            <th>Ngày</th>
+            <th>Nơi làm</th>
+            <th>Giờ bắt đầu</th>
+            <th>Giờ kết thúc</th>
+            <th>Thời gian làm (hr)</th>
+            <th>Nghỉ phép (hr)</th>
+            <th>Tổng giờ làm (hr)(*)</th>
+            <th>Overtime (hr)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each workingHourStatistic}}
+            {{#if details}}
+            {{#each details}}
+              <tr>
+                {{#ifCond @index '===' 0}}
+                <td rowspan="{{../details.length}}">{{tolocaledatestring ../date}}</td>
+                {{/ifCond}}
+                <td>{{workplace}}</td>
+                <td>{{getHours startTime}}:{{getMinutes startTime}}</td>
+                {{#if endTime}}
+                  <td>{{getHours endTime}}:{{getMinutes endTime}}</td>
+                  <td>{{subStract endTime startTime}}</td>
+                {{else}}
+                  <td>-</td>
+                  <td>-</td>
+                {{/if}}
+                {{#ifCond @index '===' 0}} 
+                {{#if ../leaveHour}}
+                <td rowspan="{{../details.length}}">{{../leaveHour}}</td>
+                <td rowspan="{{../details.length}}">{{../totalHour}}</td>
+                {{else}}
+                <td rowspan="{{../details.length}}">-</td>
+                <td rowspan="{{../details.length}}">{{../totalWorkingHour}}</td>
+                {{/if}}
+                <td rowspan="{{../details.length}}">{{../overTime}}</td>
+                {{/ifCond}}
+              </tr>
+            {{/each}}
+            {{else}}
+            {{#if leaveHour}}
+              <tr>
+                <td>{{tolocaledatestring date}}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{leaveHour}}</td>
+                <td>{{totalHour}}</td>
+                <td>-</td>
+              </tr>
+              {{/if}}
+            {{/if}} 
+          {{/each}}
+        </tbody>
+      </table>
+      <p>(*) Tổng giờ làm trong ngày đã bao gồm giờ nghỉ phép</p>
+      {{#ifCond position '===' "manager"}}
+      <h6>Được phê duyệt bởi {{directorName}} (id: {{directorId}})</h6>
+      {{else}}
+      <h6>Được phê duyệt bởi {{managerName}} (id: {{managerId}})</h6>
+      {{/ifCond}}
+      {{#if searchFromDate}}
+          <a href="/workingHourStatistic">Quay lại Thông tin giờ làm</a>
+      {{/if}}
+        <section class="pagination">
+        <div class="float-left">
+        {{#ifCond currentPage '!==' 1}}
+          {{#ifCond previousPage '!==' 1}}
+            <a href="?page=1&rowNum={{ITEMS_PER_PAGE}}{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}">1</a>
+          {{/ifCond}}
+        {{/ifCond}}
+        {{#if hasPreviousPage}}
+          <a href="?page={{previousPage}}&rowNum={{ITEMS_PER_PAGE}}{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}">{{previousPage}}</a>
+        {{/if}}
+          <a href="?page={{currentPage}}&rowNum={{ITEMS_PER_PAGE}}{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="active">{{currentPage}}</a>
+        {{#if hasNextPage}}
+          <a href="?page={{nextPage}}&rowNum={{ITEMS_PER_PAGE}}{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}">{{nextPage}}</a>
+        {{/if}}
+        {{#ifCond lastPage '!==' currentPage}}
+        {{#ifCond nextPage '!==' lastPage}}
+          <a href="?page={{lastPage}}&rowNum={{ITEMS_PER_PAGE}}{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}">{{lastPage}}</a>
+        {{/ifCond}}
+        {{/ifCond}}
+          <a href="?rowNum=10{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='10}}active{{/ifCond}}">Hiển thị 10</a>
+          <a href="?rowNum=20{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='20}}active{{/ifCond}}">Hiển thị 20</a>
+          <a href="?rowNum=30{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='30}}active{{/ifCond}}">Hiển thị 30</a>
+          <a href="?rowNum=40{{#if searchFromDate}}&searchFromDate={{searchFromDate}}{{/if}}{{#if searchToDate}}&searchToDate={{searchToDate}}{{/if}}" class="{{#ifCond ITEMS_PER_PAGE '==='40}}active{{/ifCond}}">Hiển thị 40</a>
+        </div>
+        </section>
+    {{else}}
+      <p class="mt-5">Bạn chưa có thông tin giờ làm.</p>
+    {{/if}}
+  {{else}}
+    {{#ifCond isNaNSearchFromDate '||' isNaNSearchToDate}}
+      <p class="mt-5">Bạn chưa chọn ngày để tra cứu</p>
+    {{else}}
+      <p class="mt-5">Không có thông tin giờ làm từ ngày {{tolocaledatestring searchFromDate}} đến ngày {{tolocaledatestring searchToDate}}</p>
+    {{/ifCond}}
+  {{/if}}
+  <br />
+</div>
+

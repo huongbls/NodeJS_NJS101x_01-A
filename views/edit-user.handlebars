@@ -1,0 +1,37 @@
+<div class="container">
+  <div class="card-deck">
+    <div class="card bg-light">
+      <div class="card-body text-center">
+        <img
+          class="cover narrow mb-3"
+          src="{{image}}"
+          alt="{{user.name}}"
+          style="width:100%;"
+        />
+        <p>Thay đổi ảnh đại diện: </p>
+        <form
+          action="/edit-user"
+          method="Post"
+          enctype="multipart/form-data"
+          {{! enctype="multipart/form-data;boundary=XXX" }}
+        >
+          <input type="file" name="image" id="image" />
+          <input type="hidden" name="id" value="{{user._id}}" />
+          <button type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+    <div class="card bg-light">
+      <div class="card-body text-left">
+        <h5>Họ và tên: {{user.name}}</h5>
+        <p>Ngày sinh: {{tolocaledatestring user.dob}}</p>
+        <p>Hệ số lương: {{user.salaryScale}}</p>
+        <p>Ngày bắt đầu làm việc: {{tolocaledatestring user.startDate}}</p>
+        <p>Phòng: {{user.department}}</p>
+        <p>Ngày nghỉ phép còn lại: {{user.annualLeave}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{!-- <script src="{{user.image}}"></script> --}}

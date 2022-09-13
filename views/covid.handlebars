@@ -1,0 +1,84 @@
+<h4>Thông tin Covid cá nhân</h4>
+<a href="/covid-details">Xem chi tiết Cá nhân</a>
+<br>
+{{#if manager}}
+<a href="/covid-details-staffs">Xem chi tiết Nhân viên</a>
+{{/if}}
+<div class="card-deck mt-3">
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      <h6 class="card-text mb-3">Thông tin thân nhiệt</h6>
+      <form action="/covid?type=temperature" method="POST">
+        <div class="form-group">
+          <label for="temperature">Nhiệt độ cơ thể</label>
+          <input
+            required
+            type="number"
+            class="form-control"
+            step="0.1"
+            name="temperature"
+            placeholder="Độ C"
+          />
+        </div>
+        <button type="submit" class="btn btn-secondary">Submit</button>
+      </form>
+    </div>
+  </div>
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      <h6 class="card-text mb-3">Thông tin tiêm vắcxin</h6>
+      <form action="/covid?type=vaccine" id="vaccine-details" method="POST">
+        <div class="form-group">
+          <label for="injectedNo">Mũi tiêm</label>
+          <select class="form-control" name="injectedNo">
+              <option selected="true" disabled="disabled">Chọn mũi tiêm</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label for="vaccineDate">Ngày tiêm</label>
+          <input
+            required
+            type="date"
+            class="form-control"
+            name="vaccineDate"
+          />
+        </div>
+        <div class="form-group">
+          <label for="vaccineName">Tên vắcxin</label>
+          <input
+            required
+            type="text"
+            class="form-control"
+            name="vaccineName"
+            placeholder="Tên vaccine"
+          />
+        </div>
+        <input type="hidden" name="vaccineType1" value="1" />
+        <button type="submit" class="btn btn-secondary">Submit</button>
+      </form>
+      </form>
+    </div>
+  </div>
+  <div class="card bg-light">
+    <div class="card-body text-left">
+      <h6 class="card-text mb-3">Thông tin dương tính với covid</h6>
+      <form action="/covid?type=positive" method="POST">
+        <div class="form-group">
+          <label for="temperature">Ngày phát hiện dương tính</label>
+          <input
+            required
+            type="date"
+            class="form-control"
+            name="positive"
+            placeholder="Ngày dương tính"
+          />
+        </div>
+        <button type="submit" class="btn btn-secondary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
