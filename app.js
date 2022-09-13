@@ -144,7 +144,9 @@ app.use((req, res, next) => {
 app.use(userRoutes);
 app.use("/admin", adminRoutes);
 app.use(errorControllers.getError);
-
+app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
+  console.log("Server đã khởi động tại port 3333");
+});
 // Connect to MongoDB
 dbConnect()
   .then((result) => {
@@ -168,9 +170,6 @@ dbConnect()
           });
           user.save();
         }
-        app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
-          console.log("Server đã khởi động tại port 3333");
-        });
       })
       .catch((err) => console.log(err));
   })
