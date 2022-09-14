@@ -24,9 +24,7 @@ exports.postAddEmployee = (req, res, next) => {
   const gender = req.body.gender;
   const isAdmin = req.body.isAdmin;
   const imageUrl =
-    gender === "Nam"
-      ? "http://localhost:3333/images/male-icon.png"
-      : "http://localhost:3333/images/female-icon.png";
+    gender === "Nam" ? "/images/male-icon.png" : "/images/female-icon.png";
   const employee = new User({
     name: name,
     email: email,
