@@ -160,6 +160,9 @@ exports.getPDF = async (req, res, next) => {
       _id: member._id,
       name: member.name,
       department: member.department,
+      bodyTemperatures: [],
+      vaccine: [],
+      positive: [],
     });
   });
   covidStaffInfor.forEach((object) => {

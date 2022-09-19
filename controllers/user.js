@@ -64,12 +64,12 @@ exports.postEditUser = (req, res, next) => {
     .then((user) => {
       if (user.image) {
         console.log(user.image !== "/images/male-icon.png");
-        if (
-          user.image !== "/images/male-icon.png" ||
-          user.image !== "/images/female-icon.png"
-        ) {
-          fileHelper.deleteFile(user.image);
-        }
+        // if (
+        //   user.image !== "/images/male-icon.png" ||
+        //   user.image !== "/images/female-icon.png"
+        // ) {
+        //   fileHelper.deleteFile(user.image);
+        // }
         user.image = imageFile.path.substring(6);
       }
       return user.save();
