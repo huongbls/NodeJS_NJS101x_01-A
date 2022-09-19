@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const fileHelper = require("../util/file");
 
 const { validationResult } = require("express-validator/check");
@@ -47,7 +48,6 @@ exports.postAddProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description,
       },
@@ -59,7 +59,6 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = image.path;
 
   const product = new Product({
-    // _id: new mongoose.Types.ObjectId('5badf72403fd8b5be0366e81'),
     title: title,
     price: price,
     description: description,
@@ -74,21 +73,6 @@ exports.postAddProduct = (req, res, next) => {
       res.redirect("/admin/products");
     })
     .catch((err) => {
-      // return res.status(500).render('admin/edit-product', {
-      //   pageTitle: 'Add Product',
-      //   path: '/admin/add-product',
-      //   editing: false,
-      //   hasError: true,
-      //   product: {
-      //     title: title,
-      //     imageUrl: imageUrl,
-      //     price: price,
-      //     description: description
-      //   },
-      //   errorMessage: 'Database operation failed, please try again.',
-      //   validationErrors: []
-      // });
-      // res.redirect('/500');
       const error = new Error(err);
       error.httpStatusCode = 500;
       return next(error);
@@ -96,6 +80,8 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.getEditProduct = (req, res, next) => {
+  console.log(req.body);
+  console.log(req.params);
   const editMode = req.query.edit;
   if (!editMode) {
     return res.redirect("/");
@@ -175,8 +161,6 @@ exports.postEditProduct = (req, res, next) => {
 
 exports.getProducts = (req, res, next) => {
   Product.find({ userId: req.user._id })
-    // .select('title price -_id')
-    // .populate('userId', 'name')
     .then((products) => {
       console.log(products);
       res.render("admin/products", {
@@ -192,23 +176,21 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
-exports.postDeleteProduct = (req, res, next) => {
-  const prodId = req.body.productId;
+exports.deleteProduct = (req, res, next) => {
+  const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
       if (!product) {
-        return next(new Error("Product not found!"));
+        return next(new Error("Product not found."));
       }
       fileHelper.deleteFile(product.imageUrl);
-      Product.deleteOne({ _id: prodId, userId: req.user._id });
+      return Product.deleteOne({ _id: prodId, userId: req.user._id });
     })
     .then(() => {
       console.log("DESTROYED PRODUCT");
-      res.redirect("/admin/products");
+      res.status(200).json({ message: "Success!" });
     })
     .catch((err) => {
-      const error = new Error(err);
-      error.httpStatusCode = 500;
-      return next(error);
+      res.status(500).json({ massage: "Deleting product failed" });
     });
 };
