@@ -2,13 +2,13 @@ const User = require("../models/user");
 const Absence = require("../models/absence");
 const Attendance = require("../models/attendance");
 
+//get Approve Timesheet of employees
 exports.getApproveTimesheet = async (req, res, next) => {
   const month = new Date().toISOString().slice(0, 7);
   const deptMembers = await User.find({
     department: req.user.department,
     position: "staff",
   }).lean();
-
   res.render("manager/approve-timesheet", {
     active: { approve: true },
     member: deptMembers,
@@ -20,6 +20,7 @@ exports.getApproveTimesheet = async (req, res, next) => {
   });
 };
 
+// get Approve Timesheet Search
 exports.getApproveTimesheetSearch = async (req, res, next) => {
   let staffTimesheet = [];
   const searchMonth = req.query.searchMonth;
@@ -33,7 +34,6 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
     new Date(searchMonth).getMonth() + 1,
     1
   );
-
   deptMembers.forEach((member) => {
     staffTimesheet.push({
       name: member.name,
@@ -75,6 +75,7 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
   });
 };
 
+// post Lock Employee
 exports.postLockEmployee = (req, res, next) => {
   const isLocked = req.query.isLocked;
   const id = req.query.id;
@@ -85,35 +86,49 @@ exports.postLockEmployee = (req, res, next) => {
   });
 };
 
-exports.postDeleteWorkingRecord = async (req, res, next) => {
-  const deleted = req.query.delete;
+// post delete session working
+exports.postDeleteSessionWorking = async (req, res, next) => {
   const id = req.query.id;
   const searchMonth = req.query.searchMonth;
-  const firstDayOfMonth = new Date(searchMonth);
-  const lastDayOfMonth = new Date(
-    new Date(searchMonth).getFullYear(),
-    new Date(searchMonth).getMonth() + 1,
-    1
-  );
-  const arr = [];
-
-  const absence = await Absence.find({ userId: id });
-  absence.forEach((leave) => {
-    leave.registerLeave.forEach((item) => {
-      if (item.fromDate < firstDayOfMonth || item.fromDate > lastDayOfMonth) {
-        arr.push(item);
+  const date = new Date(new Date(req.query.date).toDateString()); //T17:00:00.000Z
+  const startTime = new Date(req.query.startTime);
+  const startTimeData = new Date(
+    startTime.getFullYear(),
+    startTime.getMonth() + 1,
+    startTime.getDate(),
+    startTime.getHours() - 7,
+    startTime.getMinutes(),
+    startTime.getSeconds()
+  ).toTimeString();
+  const absenceArr = [];
+  const detailArr = [];
+  const attendance = await Attendance.find({ userId: id, date: date });
+  attendance.forEach((attend) => {
+    attend.details.forEach((item) => {
+      if (item.startTime.toTimeString() !== startTimeData) {
+        detailArr.push(item);
       }
     });
   });
-
-  const deleteFromAttendance = await Attendance.deleteMany({
-    userId: id,
-    date: { $gt: firstDayOfMonth, $lt: lastDayOfMonth },
+  const absence = await Absence.find({ userId: id });
+  absence.forEach((leave) => {
+    leave.registerLeave.forEach((item) => {
+      if (
+        new Date(item.fromDate).toISOString().slice(0, 10) !==
+        new Date(req.query.date).toISOString().slice(0, 10)
+      ) {
+        absenceArr.push(item);
+      }
+    });
   });
-
   const deleteFromAbsence = await Absence.findOneAndUpdate(
     { userId: id },
-    { $set: { registerLeave: arr } },
+    { $set: { registerLeave: absenceArr } },
+    { new: true }
+  );
+  const deleteFromAttendance = await Attendance.findOneAndUpdate(
+    { userId: id, date: date },
+    { $set: { details: detailArr } },
     { new: true }
   );
   res.redirect(`/approve-timesheet-search?searchMonth=${searchMonth}`);

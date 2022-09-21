@@ -97,7 +97,7 @@ exports.postAbsence = (req, res, next) => {
   }
 };
 
-// Get Absence Details Page
+//#region // Get Absence Details Page
 exports.getAbsenceDetails = (req, res, next) => {
   Absence.findOne({ userId: req.user._id })
     .lean()
@@ -118,3 +118,4 @@ exports.getAbsenceDetails = (req, res, next) => {
     })
     .catch((err) => console.log(err));
 };
+//#endregion

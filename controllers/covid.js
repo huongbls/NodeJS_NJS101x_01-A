@@ -94,6 +94,7 @@ exports.getCovidDetails = (req, res, next) => {
     .catch((err) => console.log(err));
 };
 
+// get covid details of staffs
 exports.getCovidDetailsStaffs = async (req, res, next) => {
   let covidStaffInfor = [];
   const deptMembers = await User.find({
@@ -131,6 +132,7 @@ exports.getCovidDetailsStaffs = async (req, res, next) => {
   });
 };
 
+// export PDF covid details of staffs
 exports.getPDF = async (req, res, next) => {
   let covidStaffInfor = [];
   const deptMembers = await User.find({

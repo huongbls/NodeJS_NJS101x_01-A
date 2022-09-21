@@ -1,5 +1,6 @@
 const User = require("../models/user");
 
+//get Login page
 exports.getLogin = (req, res, next) => {
   res.render("login", {
     pageTitle: "Login",
@@ -8,6 +9,7 @@ exports.getLogin = (req, res, next) => {
   });
 };
 
+// post Login
 exports.postLogin = (req, res, next) => {
   const email = req.body.email;
   const password = req.body.password;
@@ -22,16 +24,17 @@ exports.postLogin = (req, res, next) => {
       req.session.isLoggedIn = true;
       req.session.user = user;
       return req.session.save((err) => {
-        res.redirect("/");
+        res.redirect(req.session.user.visitedPath || "/");
       });
     })
     .catch((err) => console.log(err));
 };
 
+// post Logout
 exports.postLogout = (req, res, next) => {
   console.log("destroy", req.session.isLoggedIn);
   req.session.destroy((err) => {
-    // console.log(err);
+    console.log(err);
     res.redirect("/");
   });
 };

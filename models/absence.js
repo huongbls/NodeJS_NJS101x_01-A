@@ -42,7 +42,7 @@ const absenceSchema = new Schema({
   ],
 });
 
-//Tạo statics trả về mảng các nghỉ ngày nghỉ phép dựa trên startDate, endDate (không bao gồm thứ 7, chủ nhật)
+//#region //Tạo statics trả về mảng các nghỉ ngày nghỉ phép dựa trên startDate, endDate (không bao gồm thứ 7, chủ nhật)
 absenceSchema.statics.absenceDateRange = function (
   startDate,
   endDate,
@@ -58,8 +58,9 @@ absenceSchema.statics.absenceDateRange = function (
   }
   return dateArray;
 };
+//#endregion
 
-//Tạo statics trả về số giờ nghỉ trong ngày (không bao gồm giờ nghỉ trưa)
+//#region  //Tạo statics trả về số giờ nghỉ trong ngày (không bao gồm giờ nghỉ trưa)
 absenceSchema.statics.absenceCountHour = function (fromTime, toTime) {
   const fromHour = new Date(`1900-01-01 ${fromTime}`);
   const toHour = new Date(`1900-01-01 ${toTime}`);
@@ -72,5 +73,6 @@ absenceSchema.statics.absenceCountHour = function (fromTime, toTime) {
   }
   return countHours;
 };
+//#endregion
 
 module.exports = mongoose.model("Absence", absenceSchema);

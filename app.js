@@ -7,6 +7,7 @@ const bodyParser = require("body-parser");
 const dbConnect = require("./ultil/database").mongooseConnect;
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
+// const visitedPath = require("./middleware/visitedpath");
 const User = require("./models/user");
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -142,7 +143,7 @@ app.use((req, res, next) => {
 
 // Setting routes
 app.use(userRoutes);
-app.use("/admin", adminRoutes);
+app.use(adminRoutes);
 app.use(errorControllers.getError);
 
 // Connect to MongoDB

@@ -231,6 +231,7 @@ exports.getWorkingHourStatisticSearch = async function (req, res, next) {
     });
 };
 
+// Get Salary Statistic
 exports.getSalaryStatistic = (req, res, next) => {
   const user = new User(req.user);
   const salaryStatistic = user.getWorkingMonths();

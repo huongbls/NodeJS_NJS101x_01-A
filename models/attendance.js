@@ -21,7 +21,7 @@ const attendanceSchema = new Schema({
   isComfirmed: { type: String },
 });
 
-// Tạo statics thiết lập mảng các tháng đã làm từ ngày vào công ty đến hiện tại
+//#region  // Tạo statics thiết lập mảng các tháng đã làm từ ngày vào công ty đến hiện tại
 attendanceSchema.statics.attendanceMonthRange = function (
   startDate,
   endDate,
@@ -40,8 +40,9 @@ attendanceSchema.statics.attendanceMonthRange = function (
   }
   return monthArray;
 };
+//#endregion
 
-//Tạo statics thiết lập mảng các ngày từ fromDate đến toDdate có bao gồm cả thứ 7, chủ nhật
+//#region  //Tạo statics thiết lập mảng các ngày từ fromDate đến toDdate có bao gồm cả thứ 7, chủ nhật
 attendanceSchema.statics.workingRange = function (fromDate, toDate, steps = 1) {
   const workingArray = [];
   let currentDate = new Date(fromDate);
@@ -51,8 +52,9 @@ attendanceSchema.statics.workingRange = function (fromDate, toDate, steps = 1) {
   }
   return workingArray;
 };
+//#endregion
 
-// Tạo statics tính tổng giờ làm của một ngày
+//#region  // Tạo statics tính tổng giờ làm của một ngày
 attendanceSchema.statics.calcTotalWorkingHour = function (startTime, endTime) {
   let totalWorkingHour = 0;
   if (endTime && startTime) {
@@ -61,5 +63,6 @@ attendanceSchema.statics.calcTotalWorkingHour = function (startTime, endTime) {
   }
   return totalWorkingHour;
 };
+//#endregion
 
 module.exports = mongoose.model("Attendance", attendanceSchema);

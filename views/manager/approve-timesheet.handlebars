@@ -30,7 +30,7 @@
           {{/ifCond}}
           </form>
         </div>
-        <div id="{{_id}}" class="collapse" data-parent="#accordion">
+        <div id="{{_id}}" class="collapse show" data-parent="#accordion">
           <div class="card-body">
             {{#ifCond workingRecord.length '>' 0}}
             <table class="table table-bordered">
@@ -44,6 +44,7 @@
                   <th>Nghỉ phép (hr)</th>
                   <th>Tổng giờ làm (hr)(*)</th>
                   <th>Overtime (hr)</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -73,6 +74,19 @@
                             {{/if}}
                             <td rowspan="{{../details.length}}">{{../overTime}}</td>
                             {{/ifCond}}
+                            {{#if endTime}}
+                            <td>
+                              <form action="/approve-timesheet-search?searchMonth={{../../../searchMonth}}&id={{../../_id}}&date={{../date}}&startTime={{startTime}}&endTime={{endTime}}" method="POST">
+                                <button  class="btn btn-secondary">Delete</button>
+                              </form>
+                            </td>
+                            {{else}}
+                            <td>
+                              <form>
+                                <button class="btn btn-secondary" disabled>Delete</button>
+                              </form>
+                            </td>
+                            {{/if}}
                           </tr>
                         {{/each}}
                       {{else}}
@@ -86,15 +100,20 @@
                             <td>{{leaveHour}}</td>
                             <td>{{totalHour}}</td>
                             <td>-</td>
+                            <td>
+                              <form action="/approve-timesheet-search?searchMonth={{../../searchMonth}}&id={{../_id}}&date={{date}}" method="POST">
+                              <button  class="btn btn-secondary">Delete</button>
+                              </form>
+                            </td>
                           </tr>
                         {{/if}}
                       {{/if}}
                 {{/each}}
               </tbody>
             </table>
-            <form action="/approve-timesheet-search?searchMonth={{../searchMonth}}&id={{_id}}&delete=true" method="POST">
-              <button>Delete</button>
-            </form>
+            {{!-- <form action="/approve-timesheet-search?searchMonth={{../searchMonth}}&id={{_id}}&delete=true" method="POST">
+              <button class="btn btn-danger">Delete</button>
+            </form> --}}
             {{else}}
             {{#if ../searchMonth}}
             <p>Không có thông tin giờ làm của tháng {{ ../searchMonth}}</p>

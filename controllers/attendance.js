@@ -1,7 +1,7 @@
 const Attendance = require("../models/attendance");
 const User = require("../models/user");
 
-// Get Start Working Page
+// Get Attendance Page (Check in /Check out)
 exports.getAttendace = (req, res, next) => {
   Attendance.findOne({
     userId: req.user._id,

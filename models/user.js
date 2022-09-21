@@ -20,9 +20,10 @@ const userSchema = new Schema({
   isWorking: { type: Boolean, default: false },
   workplace: { type: String },
   isLocked: { type: String, default: false },
+  visitedPath: { type: String, default: "/" },
 });
 
-// Method tạo mảng statistics chứa các object bao gồm các ngày từ ngày vào công ty,
+//#region  // Method tạo mảng statistics chứa các object bao gồm các ngày từ ngày vào công ty,
 // đến ngày cuối cùng của năm hiện tại. Nếu có các thông tin giờ làm việc, nghỉ phép tương ứng các ngày
 //thì sẽ được thêm vào object.
 userSchema.methods.getStatistic = function () {
@@ -110,8 +111,9 @@ userSchema.methods.getStatistic = function () {
     })
     .catch((err) => console.log(err));
 };
+//#endregion
 
-// Tạo method tính số ngày làm việc của tháng (không bao gồm thứ 7, chủ nhật)
+//#region  // Tạo method tính số ngày làm việc của tháng (không bao gồm thứ 7, chủ nhật)
 userSchema.methods.getWorkingBussinessDay = function (year, month) {
   return new Array(32 - new Date(year, month, 32).getDate())
     .fill(1)
@@ -120,8 +122,9 @@ userSchema.methods.getWorkingBussinessDay = function (year, month) {
         [0, 6].indexOf(new Date(year, month, index + 1).getDay()) === -1
     ).length;
 };
+//#endregion
 
-//Methods tạo mảng chứa các tháng đã làm việc
+//#region  //Methods tạo mảng chứa các tháng đã làm việc
 userSchema.methods.getWorkingMonths = function () {
   let salaryStatistics = [];
   const monthArr = Attendance.attendanceMonthRange(
@@ -134,5 +137,6 @@ userSchema.methods.getWorkingMonths = function () {
   });
   return salaryStatistics;
 };
+//#endregion
 
 module.exports = mongoose.model("User", userSchema);
