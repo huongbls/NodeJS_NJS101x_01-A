@@ -63,6 +63,10 @@ exports.getApproveTimesheetSearch = async (req, res, next) => {
       });
     });
   }
+  // console.log(staffTimesheet);
+  console.log(staffTimesheet[0].workingRecord);
+  // console.log(staffTimesheet[1].workingRecord);
+  // console.log(staffTimesheet[2].workingRecord);
 
   res.render("manager/approve-timesheet", {
     member: staffTimesheet,
@@ -131,5 +135,13 @@ exports.postDeleteSessionWorking = async (req, res, next) => {
     { $set: { details: detailArr } },
     { new: true }
   );
+  const deleteFromAttendance2 = await Attendance.findOneAndDelete({
+    userId: id,
+    date: date,
+    details: [],
+    totalWorkingHour: 0,
+    totalHour: 0,
+    overTime: 0,
+  });
   res.redirect(`/approve-timesheet-search?searchMonth=${searchMonth}`);
 };

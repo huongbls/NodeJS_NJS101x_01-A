@@ -11,7 +11,7 @@ const visitedPath = require("../middleware/visitedpath");
 const router = express.Router();
 
 // Home Page
-router.get("/", userController.getHome);
+router.get("/", isAuth, visitedPath, userController.getHome);
 
 // Login Page
 router.get("/login", authController.getLogin);
@@ -20,11 +20,16 @@ router.post("/logout", authController.postLogout);
 // router.get("/", userController.loggedIn);
 
 // User Details Page
-router.get("/edit-user/:userId", visitedPath, userController.getEditUser);
+router.get(
+  "/edit-user/:userId",
+  isAuth,
+  visitedPath,
+  userController.getEditUser
+);
 router.post("/edit-user", visitedPath, userController.postEditUser);
 
 // About Page
-router.get("/about", visitedPath, userController.getAbout);
+router.get("/about", isAuth, visitedPath, userController.getAbout);
 
 // Statistic Page
 router.get(
