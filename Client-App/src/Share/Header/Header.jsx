@@ -14,10 +14,15 @@ function Header(props) {
 
   const dispatch = useDispatch();
 
+  window.addEventListener("storage", () => {
+    // When local storage changes do something like a refresh
+    window.location.reload();
+  });
+
   //Sau khi F5 nó sẽ kiểm tra nếu phiên làm việc của Session vẫn còn thì nó sẽ tiếp tục
   // đưa dữ liệu vào Redux
-  if (localStorage.getItem("id_user")) {
-    const action = addSession(localStorage.getItem("id_user"));
+  if (localStorage.getItem("userId")) {
+    const action = addSession(localStorage.getItem("userId"));
     dispatch(action);
   } else {
     //Đưa idTemp vào Redux temp để tạm lưu trữ
@@ -30,7 +35,10 @@ function Header(props) {
   var idUser = useSelector((state) => state.Session.idUser);
 
   //Get idtemp từ redux khi user chưa đăng nhập
-  var idTemp = useSelector((state) => state.Cart.id_user);
+  var idTemp = useSelector((state) => state.Cart.userId);
+
+  console.log("Header");
+  console.log(localStorage.getItem("userId"));
 
   console.log(idUser);
 
@@ -105,14 +113,25 @@ function Header(props) {
                 Cart
               </Link>
             </li>
-            {nameUser ? <Name /> : ""}
-            {loginUser ? <LoginLink /> : <LogoutLink />}
-            <li className="nav-item">
+            {nameUser ? <Name /> : <LogoutLink />}
+            {nameUser ? (
+              ""
+            ) : (
+              <li className="nav-item">
+                <Link className="nav-link" to={`/signup`}>
+                  <i className="fa fa-user-plus mr-1 text-gray"></i>
+                  SignUp
+                </Link>
+              </li>
+            )}
+            {/* {loginUser ? <LoginLink /> : ""} */}
+            {/* {loginUser ? <LoginLink /> : <LogoutLink />} */}
+            {/* <li className="nav-item">
               <Link className="nav-link" to={`/signup`}>
                 <i className="fa fa-user-plus mr-1 text-gray"></i>
                 SignUp
               </Link>
-            </li>
+            </li> */}
           </ul>
         </div>
       </nav>

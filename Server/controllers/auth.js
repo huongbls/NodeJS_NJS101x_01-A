@@ -12,11 +12,10 @@ exports.signup = async (req, res, next) => {
     error.data = errors.array();
     throw error;
   }
-  const fullname = req.body.fullname;
-  const email = req.body.email;
-  const password = req.body.password;
-  const phone = req.body.phone;
-  console.log(fullname);
+  const fullname = req.query.fullname;
+  const email = req.query.email;
+  const password = req.query.password;
+  const phone = req.query.phone;
   try {
     const hashedPw = await bcrypt.hash(password, 12);
 
@@ -37,8 +36,8 @@ exports.signup = async (req, res, next) => {
 };
 
 exports.login = async (req, res, next) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const email = req.query.email;
+  const password = req.query.password;
   let loadedUser;
   try {
     const user = await User.findOne({ email: email });
@@ -62,7 +61,11 @@ exports.login = async (req, res, next) => {
       "somesupersecretsecret",
       { expiresIn: "1h" }
     );
-    res.status(200).json({ token: token, userId: loadedUser._id.toString() });
+    res.status(200).json({
+      token: token,
+      userId: loadedUser._id.toString(),
+      fullname: loadedUser.fullname,
+    });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -71,15 +74,38 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.getUserStatus = async (req, res, next) => {
+// exports.getUserStatus = async (req, res, next) => {
+//   try {
+//     const user = await User.findById(req.userId);
+//     if (!user) {
+//       const error = new Error("User not found.");
+//       error.statusCode = 404;
+//       throw error;
+//     }
+//     res.status(200).json({ status: user.status });
+//   } catch (err) {
+//     if (!err.statusCode) {
+//       err.statusCode = 500;
+//     }
+//     next(err);
+//   }
+// };
+
+exports.getDetailData = async (req, res, next) => {
+  const userId = req.params.userId;
   try {
-    const user = await User.findById(req.userId);
+    const user = await User.findById(userId);
     if (!user) {
       const error = new Error("User not found.");
       error.statusCode = 404;
       throw error;
     }
-    res.status(200).json({ status: user.status });
+    res.status(200).json({
+      userId: user._id.toString(),
+      email: user.email,
+      fullname: user.fullname,
+      cart: user.cart.items,
+    });
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

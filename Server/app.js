@@ -8,6 +8,7 @@ const cors = require("cors");
 
 // const feedRoutes = require("./routes/feed");
 const authRoutes = require("./routes/auth");
+const productRoutes = require("./routes/product");
 const { v4: uuidv4 } = require("uuid");
 
 const app = express();
@@ -51,8 +52,8 @@ app.use((req, res, next) => {
   next();
 });
 
-// app.use("/feed", feedRoutes);
-app.use("/auth", authRoutes);
+app.use("/", productRoutes);
+app.use("/users", authRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);

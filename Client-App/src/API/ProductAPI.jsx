@@ -7,7 +7,7 @@ const ProductAPI = {
   },
 
   getCategory: (query) => {
-    const url = `/products/category${query}`;
+    const url = `/products-search?category=${query}`;
     return axiosClient.get(url);
   },
 
@@ -17,7 +17,7 @@ const ProductAPI = {
   },
 
   getPagination: (query) => {
-    const url = `/products/pagination${query}`;
+    const url = `/products-pagination?page=${query}`;
     return axiosClient.get(url);
   },
 };

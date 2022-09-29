@@ -78,8 +78,8 @@ function Detail(props) {
 		const fetchSendComment = async () => {
 			const params = {
 				idProduct: id,
-				idUser: localStorage.getItem('id_user'),
-				fullname: localStorage.getItem('name_user'),
+				idUser: localStorage.getItem('userId'),
+				fullname: localStorage.getItem('fullname'),
 				content: comment,
 				star: star,
 			};
@@ -125,7 +125,7 @@ function Detail(props) {
 		const fetchData = async () => {
 			const response = await ProductAPI.getAPI();
 			const data = response;
-			setProduct(data);
+			setProduct(data.products);
 		};
 
 		fetchData();
@@ -158,7 +158,7 @@ function Detail(props) {
 		const fetchData = async () => {
 			const response = await ProductAPI.getDetail(id);
 			console.log(response);
-			setDetail(response);
+			setDetail(response.product);
 		};
 
 		fetchData();

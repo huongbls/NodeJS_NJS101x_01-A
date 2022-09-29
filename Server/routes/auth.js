@@ -1,5 +1,5 @@
 const express = require("express");
-const { body } = require("express-validator/check");
+const { query } = require("express-validator/check");
 
 const User = require("../models/user");
 const authController = require("../controllers/auth");
@@ -7,10 +7,11 @@ const isAuth = require("../middleware/is-auth");
 
 const router = express.Router();
 
-router.put(
+router.post(
   "/signup",
   [
-    body("email")
+    query("fullname").trim().not().isEmpty(),
+    query("email")
       .isEmail()
       .withMessage("Please enter a valid email.")
       .custom((value, { req }) => {
@@ -21,14 +22,15 @@ router.put(
         });
       })
       .normalizeEmail(),
-    body("password").trim().isLength({ min: 5 }),
-    body("name").trim().not().isEmpty(),
-    body("phoneNumber").trim().isNumeric(),
+    query("password").trim().isLength({ min: 5 }),
+    query("phone").trim().isNumeric(),
   ],
   authController.signup
 );
 
-// router.post("/login", authController.login);
+router.post("/login", authController.login);
+
+router.get("/:userId", authController.getDetailData);
 
 // router.get("/status", isAuth, authController.getUserStatus);
 
