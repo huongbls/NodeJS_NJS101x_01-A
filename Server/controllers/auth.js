@@ -38,34 +38,48 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const email = req.query.email;
   const password = req.query.password;
-  let loadedUser;
   try {
     const user = await User.findOne({ email: email });
     if (!user) {
       const error = new Error("A user with this email could not be found.");
       error.statusCode = 401;
+      res.status(401);
       throw error;
     }
-    loadedUser = user;
+    // loadedUser = user;
     const isEqual = await bcrypt.compare(password, user.password);
     if (!isEqual) {
       const error = new Error("Wrong password!");
       error.statusCode = 401;
+      res.status(401);
       throw error;
     }
     const token = jwt.sign(
       {
-        email: loadedUser.email,
-        userId: loadedUser._id.toString(),
+        email: user.email,
+        userId: user._id.toString(),
       },
       "somesupersecretsecret",
       { expiresIn: "1h" }
     );
     res.status(200).json({
       token: token,
-      userId: loadedUser._id.toString(),
-      fullname: loadedUser.fullname,
+      _id: user._id.toString(),
+      fullname: user.fullname,
     });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+      res.status(500);
+    }
+    next(err);
+  }
+};
+
+exports.getAllData = async (req, res, next) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -126,6 +140,19 @@ exports.updateUserStatus = async (req, res, next) => {
     user.status = newStatus;
     await user.save();
     res.status(200).json({ message: "User updated." });
+  } catch (err) {
+    if (!err.statusCode) {
+      err.statusCode = 500;
+    }
+    next(err);
+  }
+};
+
+exports.getCarts = async (req, res, next) => {
+  const userId = req.query.userId;
+  try {
+    const carts = await User.findById(userId).select(carts);
+    res.status(200).json(carts);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

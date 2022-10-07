@@ -6,6 +6,7 @@ import { addSession } from "../Redux/Action/ActionSession";
 import "./Auth.css";
 import queryString from "query-string";
 import CartAPI from "../API/CartAPI";
+import bcrypt from "bcryptjs";
 
 function SignIn(props) {
   //listCart được lấy từ redux
@@ -24,10 +25,6 @@ function SignIn(props) {
   const [redirect, setRedirect] = useState(false);
 
   const [checkPush, setCheckPush] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [isAuth, setIsAuth] = useState(false);
-  const [token, setToken] = useState("");
-  const [userId, setUserId] = useState("");
 
   const dispatch = useDispatch();
 
@@ -49,7 +46,7 @@ function SignIn(props) {
     setPassword(e.target.value);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!email) {
       setErrorEmail(true);
       return;
@@ -65,90 +62,93 @@ function SignIn(props) {
           setEmailRegex(true);
           return;
         } else {
-          console.log("Login");
           setEmailRegex(false);
 
-          const fetchLogin = async () => {
-            const params = {
-              email: email,
-              password: password,
-            };
-            const query = "?" + queryString.stringify(params);
-            const response = await UserAPI.postLogin(query);
-            console.log(response);
-
-            setSuccess(true);
-            setRedirect(true);
-            setIsAuth(true);
-            setToken(response.token);
-            setUserId(response.userId);
-            localStorage.setItem("token", response.token);
-            localStorage.setItem("userId", response.userId);
-            const remainingMilliseconds = 60 * 60 * 1000;
-            const expiryDate = new Date(
-              new Date().getTime() + remainingMilliseconds
-            );
-            localStorage.setItem("expiryDate", expiryDate.toISOString());
-          };
-
-          fetchLogin();
-
-          //   const findUser = user.find((value) => {
-          //     return value.email === email;
-          //   });
-
-          //   if (!findUser) {
-          //     setErrorEmail(true);
-          //     return;
-          //   } else {
-          //     setErrorEmail(false);
-
-          //     if (findUser.password !== password) {
+          //   const fetchLogin = async () => {
+          //     const params = {
+          //       email: email,
+          //       password: password,
+          //     };
+          //     const query = "?" + queryString.stringify(params);
+          //     const response = await UserAPI.postLogin(query);
+          //     console.log("response");
+          //     console.log(response.status);
+          //     if (!response) {
+          //       setErrorEmail(true);
           //       setErrorPassword(true);
-          //       return;
           //     } else {
+          //       setErrorEmail(false);
           //       setErrorPassword(false);
+          //       localStorage.setItem("id_user", response._id);
 
-          //       localStorage.setItem("id_user", findUser._id);
-
-          //       localStorage.setItem("name_user", findUser.fullname);
+          //       localStorage.setItem("name_user", response.fullname);
 
           //       const action = addSession(localStorage.getItem("id_user"));
           //       dispatch(action);
 
           //       setCheckPush(true);
           //     }
-          //   }
+          //   };
+
+          //   fetchLogin();
+
+          const findUser = user.find((value) => {
+            return value.email === email;
+          });
+
+          if (!findUser) {
+            setErrorEmail(true);
+            return;
+          } else {
+            setErrorEmail(false);
+
+            // if (findUser.password !== password) {
+            if (!(await bcrypt.compare(password, findUser.password))) {
+              setErrorPassword(true);
+              return;
+            } else {
+              setErrorPassword(false);
+
+              localStorage.setItem("id_user", findUser._id);
+
+              localStorage.setItem("name_user", findUser.fullname);
+
+              const action = addSession(localStorage.getItem("id_user"));
+              dispatch(action);
+
+              setCheckPush(true);
+            }
+          }
         }
       }
     }
   };
 
   //Hàm này dùng để đưa hết tất cả carts vào API của user
-  //   useEffect(() => {
-  //     const fetchData = async () => {
-  //       //Lần đầu sẽ không thực hiện insert được vì addCart = ''
-  //       if (checkPush === true) {
-  //         for (let i = 0; i < listCart.length; i++) {
-  //           //Nó sẽ lấy idUser và idProduct và count cần thêm để gửi lên server
-  //           const params = {
-  //             idUser: localStorage.getItem("id_user"),
-  //             idProduct: listCart[i].idProduct,
-  //             count: listCart[i].count,
-  //           };
+  useEffect(() => {
+    const fetchData = async () => {
+      //Lần đầu sẽ không thực hiện insert được vì addCart = ''
+      if (checkPush === true) {
+        for (let i = 0; i < listCart.length; i++) {
+          //Nó sẽ lấy idUser và idProduct và count cần thêm để gửi lên server
+          const params = {
+            idUser: localStorage.getItem("id_user"),
+            idProduct: listCart[i].idProduct,
+            count: listCart[i].count,
+          };
 
-  //           const query = "?" + queryString.stringify(params);
+          const query = "?" + queryString.stringify(params);
 
-  //           const response = await CartAPI.postAddToCart(query);
-  //           console.log(response);
-  //         }
+          const response = await CartAPI.postAddToCart(query);
+          console.log(response);
+        }
 
-  //         setRedirect(true);
-  //       }
-  //     };
+        setRedirect(true);
+      }
+    };
 
-  //     fetchData();
-  //   }, [checkPush]);
+    fetchData();
+  }, [checkPush]);
 
   function validateEmail(email) {
     const re =

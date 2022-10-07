@@ -3,6 +3,8 @@ import ProductAPI from "../API/ProductAPI";
 import Image from "../Share/img/Image";
 import convertMoney from "../convertMoney";
 import { Link } from "react-router-dom";
+import io from "socket.io-client";
+const socket = io("http://localhost:5000", { transports: ["websocket"] });
 
 function Home(props) {
   const [products, setProducts] = useState([]);
@@ -13,9 +15,10 @@ function Home(props) {
       const response = await ProductAPI.getAPI();
       console.log(response);
 
-      //   const data = response.splice(0, 8);
+      // const data = response.splice(0, 8);
+      const data = response;
 
-      setProducts(response.products);
+      setProducts(data);
     };
 
     fetchData();

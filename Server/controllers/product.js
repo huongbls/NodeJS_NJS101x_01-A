@@ -17,11 +17,7 @@ exports.getProducts = async (req, res, next) => {
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
 
-    res.status(200).json({
-      message: "Fetched products successfully.",
-      products: products,
-      totalItems: totalItems,
-    });
+    res.status(200).json(products);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -34,10 +30,7 @@ exports.getProductDetail = async (req, res, next) => {
   const prodId = req.params.prodId;
   try {
     const product = await Product.findById(prodId);
-    res.status(200).json({
-      message: "Fetched a product successfully.",
-      product: product,
-    });
+    res.status(200).json(product);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -56,11 +49,7 @@ exports.getProductsPagination = async (req, res, next) => {
       .skip((currentPage - 1) * perPage)
       .limit(perPage);
 
-    res.status(200).json({
-      message: "Fetched products pagination successfully.",
-      products: products,
-      totalItems: totalItems,
-    });
+    res.status(200).json(products);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;
@@ -73,10 +62,7 @@ exports.getProductsCategory = async (req, res, next) => {
   const category = req.query.category;
   try {
     const products = await Product.find({ category: category });
-    res.status(200).json({
-      message: "Fetched products category successfully.",
-      products: products,
-    });
+    res.status(200).json(products);
   } catch (err) {
     if (!err.statusCode) {
       err.statusCode = 500;

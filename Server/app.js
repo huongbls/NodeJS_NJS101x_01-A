@@ -6,9 +6,12 @@ const mongoose = require("mongoose");
 const multer = require("multer");
 const cors = require("cors");
 
-// const feedRoutes = require("./routes/feed");
 const authRoutes = require("./routes/auth");
 const productRoutes = require("./routes/product");
+const checkoutRoutes = require("./routes/checkout");
+const cartRoutes = require("./routes/cart");
+const historyRoutes = require("./routes/histories");
+const chatroomRoutes = require("./routes/chatroom");
 const { v4: uuidv4 } = require("uuid");
 
 const app = express();
@@ -54,6 +57,10 @@ app.use((req, res, next) => {
 
 app.use("/", productRoutes);
 app.use("/users", authRoutes);
+app.use("/carts", cartRoutes);
+app.use("/email", checkoutRoutes);
+app.use("/histories", historyRoutes);
+app.use("/chatrooms", chatroomRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -66,16 +73,25 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(
     "mongodb+srv://admin:b56pSqlM4t4XPX05@funixasm3.hikmeel.mongodb.net/shop?retryWrites=true&w=majority",
-    { useNewUrlParser: true, useUnifiedTopology: true }
+    { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false }
   )
   .then((result) => {
     console.log("Connect to DB");
-    const server = app.listen(8080, () => {
-      console.log("Server is running at port 8080");
+    const server = app.listen(5000, () => {
+      console.log("Server is running at port 5000");
     });
-    // const io = require("./socket").init(server);
-    // io.on("connection", (socket) => {
-    //   console.log("Client connected");
-    // });
+    const io = require("./socket").init(server);
+    io.on("connection", (socket) => {
+      // console.log("Client connected_" + socket.id);
+      // socket.on("disconnect", () => {
+      //   console.log("Disconnnect " + socket.id);
+      // });
+      socket.on("send_message", (data) => {
+        console.log(data);
+      });
+      socket.on("hello", (data) => {
+        console.log(data);
+      });
+    });
   })
   .catch((err) => console.log(err));

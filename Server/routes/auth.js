@@ -32,6 +32,8 @@ router.post("/login", authController.login);
 
 router.get("/:userId", authController.getDetailData);
 
+router.get("/", authController.getAllData);
+
 // router.get("/status", isAuth, authController.getUserStatus);
 
 // router.patch(
