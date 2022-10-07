@@ -9,6 +9,7 @@ import Header from "./Share/Header/Header";
 import SignIn from "./Authentication/SignIn";
 import SignUp from "./Authentication/SignUp";
 import Chat from "./Chat/Chat";
+import Products from "./Products/Products";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Header />
         <Switch>
           <Route exact path="/" component={Chat} />{" "}
+          <Route exact path="/products" component={Products} />{" "}
           {/* <Route path='/detail/:id' component={Detail} />{' '}
 					<Route path='/cart' component={Cart} />{' '} */}
           <Route path="/signin" component={SignIn} />{" "}

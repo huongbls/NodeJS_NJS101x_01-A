@@ -116,34 +116,33 @@ function Chat(props) {
       <div className="row">
         <div className="card bg-light col-md-4 col-sm-12">
           <div className="card-body text-left">
-            <form>
-              <input type="search" placeholder="Search Contact" />
-            </form>
-            {chatroom.map((value) => (
-              <div className="media media-chat pt-3" key={value._id}>
-                <img
-                  className="avatar"
-                  src="https://img.icons8.com/color/36/000000/administrator-male.png"
-                  alt="..."
-                />
-                <button
-                  onClick={detailChatroom}
-                  className="btn text-info"
-                  value={value._id}
-                  data-abc="true"
-                >
-                  {value._id}
-                </button>
-              </div>
-            ))}
+            <div className="fix_scoll">
+              <form>
+                <input type="search" placeholder="Search Contact" />
+              </form>
+              {chatroom.map((value) => (
+                <div className="media media-chat pt-3" key={value._id}>
+                  <img
+                    className="avatar"
+                    src="https://img.icons8.com/color/36/000000/administrator-male.png"
+                    alt="..."
+                  />
+                  <button
+                    onClick={detailChatroom}
+                    className="btn text-info"
+                    value={value._id}
+                    data-abc="true"
+                  >
+                    {value._id}
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
         <div className="card bg-white border border-light col-md-8 col-sm-12">
           <div className="card-body text-left">
-            <div
-              className="ps-container ps-theme-default ps-active-y fix_scoll"
-              // className="ps-container ps-theme-default ps-active-y fix_scoll"
-            >
+            <div className="ps-container ps-theme-default ps-active-y fix_scoll_1">
               {message &&
                 message.map((value) =>
                   !value.is_admin ? (

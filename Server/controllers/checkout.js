@@ -19,8 +19,7 @@ const template = handlebars.compile(emailTemplate);
 
 const options = {
   auth: {
-    api_key:
-      "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",
+    api_key: API_KEY, //cannot public into github
   },
 };
 
