@@ -17,12 +17,6 @@ handlebars.registerHelper("multiple", function (value1, value2) {
 
 const template = handlebars.compile(emailTemplate);
 
-const options = {
-  auth: {
-    api_key: API_KEY, //cannot public into github
-  },
-};
-
 const mailer = nodemailer.createTransport(sgTransport(options));
 
 exports.postEmail = async (req, res, next) => {
@@ -59,7 +53,7 @@ exports.postEmail = async (req, res, next) => {
 
   const email = {
     to: to,
-    from: "huong050390@hotmail.com",
+    from: "xxx@xxx.com",
     subject: `Xác nhận đơn đặt hàng ngày ${new Date().toLocaleDateString()} 
       (${new Date().toTimeString()})`,
     html: messageBody,
